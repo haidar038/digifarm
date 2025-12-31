@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 
 .env
+.agent
+
+docs
+
+supabase/.temp
