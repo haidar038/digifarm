@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       activities: {
@@ -125,7 +150,9 @@ export type Database = {
           notes: string | null
           planting_date: string
           seed_count: number
+          selling_price_per_kg: number | null
           status: string
+          total_cost: number | null
           updated_at: string
         }
         Insert: {
@@ -139,7 +166,9 @@ export type Database = {
           notes?: string | null
           planting_date: string
           seed_count: number
+          selling_price_per_kg?: number | null
           status?: string
+          total_cost?: number | null
           updated_at?: string
         }
         Update: {
@@ -153,7 +182,9 @@ export type Database = {
           notes?: string | null
           planting_date?: string
           seed_count?: number
+          selling_price_per_kg?: number | null
           status?: string
+          total_cost?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -165,6 +196,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_profiles: {
+        Row: {
+          created_at: string | null
+          district_code: string | null
+          district_name: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          province_code: string | null
+          province_name: string | null
+          regency_code: string | null
+          regency_name: string | null
+          role: string | null
+          updated_at: string | null
+          village_code: string | null
+          village_name: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          district_code?: string | null
+          district_name?: string | null
+          full_name: string
+          id: string
+          phone?: string | null
+          province_code?: string | null
+          province_name?: string | null
+          regency_code?: string | null
+          regency_name?: string | null
+          role?: string | null
+          updated_at?: string | null
+          village_code?: string | null
+          village_name?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          district_code?: string | null
+          district_name?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          province_code?: string | null
+          province_name?: string | null
+          regency_code?: string | null
+          regency_name?: string | null
+          role?: string | null
+          updated_at?: string | null
+          village_code?: string | null
+          village_name?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
@@ -300,6 +382,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

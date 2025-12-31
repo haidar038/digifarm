@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format } from "@/lib/dateUtils";
 import { addDays } from "date-fns";
+import { RotationSuggestion } from "./RotationSuggestion";
+import { translateCommodity } from "@/lib/i18n";
 
 const formSchema = z.object({
     land_id: z.string().min(1, "Silakan pilih lahan"),
@@ -25,6 +27,8 @@ const formSchema = z.object({
     // Harvest fields (for editing harvested productions)
     harvest_date: z.string().optional(),
     harvest_yield_kg: z.coerce.number().optional(),
+    total_cost: z.coerce.number().optional(),
+    selling_price_per_kg: z.coerce.number().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -34,10 +38,11 @@ interface ProductionFormProps {
     onOpenChange: (open: boolean) => void;
     production?: Production | null;
     lands: Land[];
+    productions?: Production[];
     onSuccess: () => void;
 }
 
-export function ProductionForm({ open, onOpenChange, production, lands, onSuccess }: ProductionFormProps) {
+export function ProductionForm({ open, onOpenChange, production, lands, productions = [], onSuccess }: ProductionFormProps) {
     const [showCustom, setShowCustom] = useState(false);
 
     const form = useForm<FormData>({
@@ -52,6 +57,8 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
             notes: "",
             harvest_date: "",
             harvest_yield_kg: 0,
+            total_cost: 0,
+            selling_price_per_kg: 0,
         },
     });
 
@@ -71,6 +78,8 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
                 notes: production.notes || "",
                 harvest_date: production.harvest_date || "",
                 harvest_yield_kg: production.harvest_yield_kg || 0,
+                total_cost: production.total_cost || 0,
+                selling_price_per_kg: production.selling_price_per_kg || 0,
             });
             setShowCustom(isOther);
         } else {
@@ -84,16 +93,24 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
                 notes: "",
                 harvest_date: "",
                 harvest_yield_kg: 0,
+                total_cost: 0,
+                selling_price_per_kg: 0,
             });
             setShowCustom(false);
         }
     }, [production, form]);
 
     const watchCommodity = form.watch("commodity");
+    const watchLandId = form.watch("land_id");
 
     useEffect(() => {
         setShowCustom(watchCommodity === "Others");
     }, [watchCommodity]);
+
+    // Handler for rotation suggestion click
+    const handleSelectCommodity = (commodity: string) => {
+        form.setValue("commodity", commodity);
+    };
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -109,6 +126,8 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
                 status: "planted" as "planted" | "growing" | "harvested",
                 harvest_date: null as string | null,
                 harvest_yield_kg: null as number | null,
+                total_cost: null as number | null,
+                selling_price_per_kg: null as number | null,
             };
 
             // If editing, preserve or update harvest data and status
@@ -117,6 +136,8 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
                 if (isHarvested) {
                     productionData.harvest_date = data.harvest_date || null;
                     productionData.harvest_yield_kg = data.harvest_yield_kg || null;
+                    productionData.total_cost = data.total_cost || null;
+                    productionData.selling_price_per_kg = data.selling_price_per_kg || null;
                     // Keep status as harvested if harvest data exists
                     productionData.status = data.harvest_date && data.harvest_yield_kg ? "harvested" : production.status;
                 } else {
@@ -151,7 +172,7 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{production ? "Edit Produksi" : "Tambah Produksi Baru"}</DialogTitle>
                 </DialogHeader>
@@ -182,6 +203,9 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
                             )}
                         />
 
+                        {/* Rotation Suggestion - only show when adding new production */}
+                        {!production && <RotationSuggestion landId={watchLandId || null} productions={productions} selectedCommodity={watchCommodity} onSelectCommodity={handleSelectCommodity} />}
+
                         <FormField
                             control={form.control}
                             name="commodity"
@@ -197,7 +221,7 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
                                         <SelectContent>
                                             {COMMODITIES.map((commodity) => (
                                                 <SelectItem key={commodity} value={commodity}>
-                                                    {commodity}
+                                                    {translateCommodity(commodity)}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -269,7 +293,7 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
                         {/* Harvest Data Section - Only shown when editing harvested production */}
                         {isHarvested && (
                             <div className="space-y-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
-                                <p className="text-sm font-medium text-primary">Data Panen</p>
+                                <p className="text-sm font-medium text-primary">Data Panen & Finansial</p>
                                 <div className="grid grid-cols-2 gap-4">
                                     <FormField
                                         control={form.control}
@@ -292,6 +316,34 @@ export function ProductionForm({ open, onOpenChange, production, lands, onSucces
                                                 <FormLabel>Hasil Panen (kg)</FormLabel>
                                                 <FormControl>
                                                     <Input type="number" step="0.1" placeholder="0" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-primary/10">
+                                    <FormField
+                                        control={form.control}
+                                        name="total_cost"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Total Biaya (Rp)</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" step="1000" placeholder="0" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="selling_price_per_kg"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Harga Jual / kg (Rp)</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" step="100" placeholder="0" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

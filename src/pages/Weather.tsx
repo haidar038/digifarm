@@ -1,5 +1,6 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useWeather, getFarmingRecommendations } from "@/hooks/useWeather";
 import { WeatherIcon, RecommendationIcon } from "@/components/weather/WeatherIcon";
 import { Eye, Wind, Thermometer, CalendarDays, Leaf, RefreshCw, Droplets, Cloud } from "lucide-react";
@@ -132,11 +133,12 @@ const Weather = () => {
                             Prakiraan Hari Ini
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="px-0 sm:px-0">
-                        <div className="w-full min-w-0 overflow-hidden">
-                            <div className="flex gap-2 overflow-x-auto pb-3 px-4 sm:px-6 scroll-pl-4 sm:scroll-pl-6 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent snap-x snap-mandatory">
+                    <CardContent className="px-4 sm:px-6">
+                        {/* Mobile/Tablet: Scrollable flex container with shadcn ScrollArea */}
+                        <ScrollArea className="lg:hidden w-full whitespace-nowrap">
+                            <div className="flex w-max gap-2 pb-3">
                                 {weather.hourly.slice(0, 12).map((hour, index) => (
-                                    <div key={index} className="flex flex-col items-center flex-shrink-0 w-[60px] sm:w-[68px] bg-muted/50 rounded-lg sm:rounded-xl p-2 sm:p-3 transition-all hover:bg-muted snap-start">
+                                    <div key={index} className="flex flex-col items-center shrink-0 w-[60px] sm:w-[72px] bg-muted/50 rounded-lg sm:rounded-xl p-2 sm:p-3 transition-all hover:bg-muted">
                                         <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">{formatHour(hour.time)}</span>
                                         <WeatherIcon weatherCode={hour.weatherCode} size="md" className="my-1 sm:my-1.5" />
                                         <span className="text-xs sm:text-sm font-semibold">{hour.temperature}°</span>
@@ -147,6 +149,21 @@ const Weather = () => {
                                     </div>
                                 ))}
                             </div>
+                            <ScrollBar orientation="horizontal" />
+                        </ScrollArea>
+                        {/* Desktop: Full-width grid */}
+                        <div className="hidden lg:grid grid-cols-12 gap-2">
+                            {weather.hourly.slice(0, 12).map((hour, index) => (
+                                <div key={index} className="flex flex-col items-center bg-muted/50 rounded-xl p-3 transition-all hover:bg-muted">
+                                    <span className="text-xs text-muted-foreground whitespace-nowrap">{formatHour(hour.time)}</span>
+                                    <WeatherIcon weatherCode={hour.weatherCode} size="md" className="my-1.5" />
+                                    <span className="text-sm font-semibold">{hour.temperature}°</span>
+                                    <div className="flex items-center gap-0.5 mt-0.5">
+                                        <Droplets className="w-2.5 h-2.5 text-blue-400" />
+                                        <span className="text-[10px] text-muted-foreground">{hour.precipitationProbability}%</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </CardContent>
                 </Card>

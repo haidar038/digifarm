@@ -1,19 +1,29 @@
-import { LayoutDashboard, Map, Sprout, Cloud } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { LayoutDashboard, Map, Sprout, Cloud, LogOut, User } from "lucide-react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/auth-context";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
     { title: "Ringkasan", url: "/", icon: LayoutDashboard },
     { title: "Manajemen Lahan", url: "/lands", icon: Map },
     { title: "Produksi", url: "/production", icon: Sprout },
     { title: "Cuaca", url: "/weather", icon: Cloud },
+    { title: "Profil", url: "/profile", icon: User },
 ];
 
 export function AppSidebar() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { signOut } = useAuth();
     const { state } = useSidebar();
     const isCollapsed = state === "collapsed";
+
+    const handleLogout = async () => {
+        await signOut();
+        navigate("/login");
+    };
 
     return (
         <Sidebar collapsible="icon" className="border-r border-border bg-sidebar">
@@ -60,6 +70,13 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+
+            <SidebarFooter className="p-4 border-t border-sidebar-border">
+                <Button variant="ghost" className={cn("w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10", isCollapsed && "justify-center px-2")} onClick={handleLogout}>
+                    <LogOut className="w-5 h-5 mr-3" />
+                    {!isCollapsed && <span>Keluar</span>}
+                </Button>
+            </SidebarFooter>
         </Sidebar>
     );
 }

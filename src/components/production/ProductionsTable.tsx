@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, CheckCircle, Sprout, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, CheckCircle, Sprout, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown } from "lucide-react";
 import { Production } from "@/types/database";
 import { cn } from "@/lib/utils";
 import { formatShortDate } from "@/lib/dateUtils";
 import { useTranslation } from "react-i18next";
 import { translateCommodity } from "@/lib/i18n";
+import { calculateFinancialSummary, formatCurrencyCompact } from "@/lib/cost-utils";
 
 interface ProductionsTableProps {
     productions: Production[];
@@ -26,7 +27,7 @@ const ITEMS_PER_PAGE = 10;
 // Status order for sorting (outside component to avoid dependency warning)
 const STATUS_ORDER = { planted: 0, growing: 1, harvested: 2 } as const;
 
-type SortField = "commodity" | "land" | "planting_date" | "seed_count" | "harvest_date" | "harvest_yield_kg" | "status" | null;
+type SortField = "commodity" | "land" | "planting_date" | "seed_count" | "harvest_date" | "harvest_yield_kg" | "profit" | "status" | null;
 type SortDirection = "asc" | "desc";
 
 export function ProductionsTable({ productions, selectedIds, onSelectionChange, onEdit, onHarvest, onDelete, loading }: ProductionsTableProps) {
@@ -70,6 +71,12 @@ export function ProductionsTable({ productions, selectedIds, onSelectionChange, 
                 case "harvest_yield_kg":
                     comparison = (a.harvest_yield_kg || 0) - (b.harvest_yield_kg || 0);
                     break;
+                case "profit": {
+                    const aFinance = calculateFinancialSummary(a);
+                    const bFinance = calculateFinancialSummary(b);
+                    comparison = aFinance.profit - bFinance.profit;
+                    break;
+                }
                 case "status":
                     comparison = STATUS_ORDER[a.status] - STATUS_ORDER[b.status];
                     break;
@@ -194,6 +201,12 @@ export function ProductionsTable({ productions, selectedIds, onSelectionChange, 
                                     {getSortIcon("harvest_yield_kg")}
                                 </button>
                             </TableHead>
+                            <TableHead className="font-semibold hidden xl:table-cell">
+                                <button onClick={() => handleSort("profit")} className="flex items-center hover:text-primary transition-colors">
+                                    Untung/Rugi
+                                    {getSortIcon("profit")}
+                                </button>
+                            </TableHead>
                             <TableHead className="font-semibold">
                                 <button onClick={() => handleSort("status")} className="flex items-center hover:text-primary transition-colors">
                                     Status
@@ -215,8 +228,20 @@ export function ProductionsTable({ productions, selectedIds, onSelectionChange, 
                                 <TableCell className="hidden lg:table-cell">{production.seed_count.toLocaleString()}</TableCell>
                                 <TableCell className="hidden lg:table-cell">{production.harvest_date ? formatShortDate(production.harvest_date) : "-"}</TableCell>
                                 <TableCell className="hidden md:table-cell font-medium">{production.harvest_yield_kg ? `${production.harvest_yield_kg.toLocaleString()} kg` : "-"}</TableCell>
+                                <TableCell className="hidden xl:table-cell">
+                                    {(() => {
+                                        const finance = calculateFinancialSummary(production);
+                                        if (!finance.hasData) return <span className="text-muted-foreground">-</span>;
+                                        return (
+                                            <span className={cn("flex items-center gap-1 font-medium", finance.status === "profit" && "text-green-600", finance.status === "loss" && "text-red-600")}>
+                                                {finance.status === "profit" ? <TrendingUp className="h-3 w-3" /> : finance.status === "loss" ? <TrendingDown className="h-3 w-3" /> : null}
+                                                {formatCurrencyCompact(finance.profit)}
+                                            </span>
+                                        );
+                                    })()}
+                                </TableCell>
                                 <TableCell>
-                                    <Badge className={cn(statusStyles[production.status], "capitalize")}>{t(`status.${production.status}`)}</Badge>
+                                    <Badge className={cn(statusStyles[production.status], "capitalize", "hover:text-white transition-colors")}>{t(`status.${production.status}`)}</Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <DropdownMenu>

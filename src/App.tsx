@@ -4,11 +4,21 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/error";
+import { AuthProvider } from "@/contexts/AuthProvider";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { handleError } from "@/lib/error-utils";
+
+// Auth pages
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+
+// Protected pages
 import Index from "./pages/Index";
 import Lands from "./pages/Lands";
 import Production from "./pages/Production";
 import Weather from "./pages/Weather";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -29,19 +39,64 @@ const queryClient = new QueryClient({
 const App = () => (
     <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<Index />} />
-                        <Route path="/lands" element={<Lands />} />
-                        <Route path="/production" element={<Production />} />
-                        <Route path="/weather" element={<Weather />} />
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
-                </BrowserRouter>
-            </TooltipProvider>
+            <AuthProvider>
+                <TooltipProvider>
+                    <Toaster />
+                    <Sonner />
+                    <BrowserRouter>
+                        <Routes>
+                            {/* Public routes */}
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Register />} />
+                            <Route path="/forgot-password" element={<ForgotPassword />} />
+
+                            {/* Protected routes */}
+                            <Route
+                                path="/"
+                                element={
+                                    <ProtectedRoute>
+                                        <Index />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/lands"
+                                element={
+                                    <ProtectedRoute>
+                                        <Lands />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/production"
+                                element={
+                                    <ProtectedRoute>
+                                        <Production />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/weather"
+                                element={
+                                    <ProtectedRoute>
+                                        <Weather />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/profile"
+                                element={
+                                    <ProtectedRoute>
+                                        <Profile />
+                                    </ProtectedRoute>
+                                }
+                            />
+
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+                    </BrowserRouter>
+                </TooltipProvider>
+            </AuthProvider>
         </QueryClientProvider>
     </ErrorBoundary>
 );

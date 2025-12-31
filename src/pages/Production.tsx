@@ -141,9 +141,9 @@ const ProductionPage = () => {
                 <ProductionsTable productions={productions} selectedIds={selectedIds} onSelectionChange={setSelectedIds} loading={loading} onEdit={handleEdit} onHarvest={setHarvestingProduction} onDelete={setDeletingProduction} />
 
                 {/* Forms and Dialogs */}
-                <ProductionForm open={formOpen} onOpenChange={handleFormClose} production={editingProduction} lands={lands} onSuccess={fetchData} />
+                <ProductionForm open={formOpen} onOpenChange={handleFormClose} production={editingProduction} lands={lands} productions={productions} onSuccess={fetchData} />
 
-                {harvestingProduction && <HarvestForm open={!!harvestingProduction} onOpenChange={() => setHarvestingProduction(null)} production={harvestingProduction} onSuccess={fetchData} />}
+                {harvestingProduction && <HarvestForm open={!!harvestingProduction} onOpenChange={() => setHarvestingProduction(null)} production={harvestingProduction} onSuccess={fetchData} historicalProductions={productions} />}
 
                 <AlertDialog open={!!deletingProduction} onOpenChange={() => setDeletingProduction(null)}>
                     <AlertDialogContent>
