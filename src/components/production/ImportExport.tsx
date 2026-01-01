@@ -2,6 +2,7 @@ import { useRef } from "react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import html2canvas from "html2canvas";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Upload, Download, FileSpreadsheet, FileText } from "lucide-react";
@@ -195,13 +196,52 @@ export function ImportExport({ productions, lands, onImportSuccess }: ImportExpo
         XLSX.writeFile(wb, `productions_${format(new Date(), "yyyy-MM-dd")}.xlsx`);
     };
 
-    const exportToPDF = () => {
+    const exportToPDF = async () => {
         const doc = new jsPDF();
+        const pageHeight = doc.internal.pageSize.height;
+        const pageWidth = doc.internal.pageSize.width;
+        const margin = 14;
+        const maxImageWidth = (pageWidth - margin * 3) / 2; // Two images side by side
 
         doc.setFontSize(18);
-        doc.text("Laporan Produksi", 14, 22);
+        doc.text("Laporan Produksi", margin, 22);
         doc.setFontSize(10);
-        doc.text(`Dibuat pada ${formatDate(new Date(), "PPP")}`, 14, 30);
+        doc.text(`Dibuat pada ${formatDate(new Date(), "PPP")}`, margin, 30);
+
+        let currentY = 35;
+
+        // Capture Charts
+        try {
+            const periodChart = document.getElementById("chart-production-period");
+            const commodityChart = document.getElementById("chart-production-commodity");
+
+            if (periodChart && commodityChart) {
+                const canvas1 = await html2canvas(periodChart, { scale: 2 });
+                const imgData1 = canvas1.toDataURL("image/png");
+                const aspectRatio1 = canvas1.height / canvas1.width;
+                const imgHeight1 = maxImageWidth * aspectRatio1;
+
+                const canvas2 = await html2canvas(commodityChart, { scale: 2 });
+                const imgData2 = canvas2.toDataURL("image/png");
+                const aspectRatio2 = canvas2.height / canvas2.width;
+                const imgHeight2 = maxImageWidth * aspectRatio2;
+
+                const maxChartHeight = Math.max(imgHeight1, imgHeight2);
+
+                // Add Bar Chart
+                doc.setFontSize(10);
+                doc.text("Produksi per Periode", margin, currentY + 5);
+                doc.addImage(imgData1, "PNG", margin, currentY + 8, maxImageWidth, imgHeight1);
+
+                // Add Pie Chart
+                doc.text("Produksi per Komoditas", margin + maxImageWidth + 10, currentY + 5);
+                doc.addImage(imgData2, "PNG", margin + maxImageWidth + 10, currentY + 8, maxImageWidth, imgHeight2);
+
+                currentY += maxChartHeight + 15;
+            }
+        } catch (err) {
+            console.error("Error capturing charts:", err);
+        }
 
         const tableData = productions.map((p) => [
             p.commodity,
@@ -216,22 +256,29 @@ export function ImportExport({ productions, lands, onImportSuccess }: ImportExpo
         autoTable(doc, {
             head: [["Komoditas", "Lahan", "Tanam", "Benih", "Panen", "Hasil", "Status"]],
             body: tableData,
-            startY: 40,
+            startY: currentY + 5,
             styles: { fontSize: 8 },
             headStyles: { fillColor: [105, 185, 83] },
         });
 
-        // Summary
+        // Summary - check if there's enough space, otherwise add new page
         const totalYield = productions.reduce((sum, p) => sum + (p.harvest_yield_kg || 0), 0);
         const harvestedCount = productions.filter((p) => p.status === "harvested").length;
 
-        const finalY = (doc as any).lastAutoTable.finalY || 40;
+        let tableFinalY = (doc as any).lastAutoTable.finalY || currentY + 10;
+        const summaryHeight = 50; // Approximate height needed for summary
+
+        if (tableFinalY + summaryHeight > pageHeight - 10) {
+            doc.addPage();
+            tableFinalY = 20;
+        }
+
         doc.setFontSize(12);
-        doc.text("Ringkasan", 14, finalY + 15);
+        doc.text("Ringkasan", margin, tableFinalY + 15);
         doc.setFontSize(10);
-        doc.text(`Total Produksi: ${productions.length}`, 14, finalY + 25);
-        doc.text(`Dipanen: ${harvestedCount}`, 14, finalY + 32);
-        doc.text(`Total Hasil: ${totalYield.toLocaleString()} kg`, 14, finalY + 39);
+        doc.text(`Total Produksi: ${productions.length}`, margin, tableFinalY + 25);
+        doc.text(`Dipanen: ${harvestedCount}`, margin, tableFinalY + 32);
+        doc.text(`Total Hasil: ${totalYield.toLocaleString()} kg`, margin, tableFinalY + 39);
 
         doc.save(`productions_${format(new Date(), "yyyy-MM-dd")}.pdf`);
     };

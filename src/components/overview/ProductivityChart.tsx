@@ -119,9 +119,9 @@ export function ProductivityChart({ productions }: ProductivityChartProps) {
                                     boxShadow: "var(--shadow-md)",
                                 }}
                                 labelStyle={{ color: "hsl(var(--foreground))", fontWeight: "bold" }}
-                                formatter={(value: number, name: string) => [`${value} kg`, name]}
+                                formatter={(value: number, name: string) => [`${value} kg`, translateCommodity(name)]}
                             />
-                            <Legend wrapperStyle={{ paddingTop: "10px" }} formatter={(value) => <span style={{ color: "hsl(var(--foreground))" }}>{value}</span>} />
+                            <Legend wrapperStyle={{ paddingTop: "10px" }} formatter={(value) => <span style={{ color: "hsl(var(--foreground))" }}>{translateCommodity(value)}</span>} />
                             {commodities.map((commodity) => (
                                 <Line
                                     key={commodity}

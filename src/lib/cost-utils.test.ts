@@ -18,6 +18,7 @@ import { Production } from "@/types/database";
 function createMockProduction(overrides: Partial<Production> = {}): Production {
     return {
         id: overrides.id || "prod-1",
+        user_id: overrides.user_id || "user-1",
         land_id: overrides.land_id || "land-1",
         commodity: overrides.commodity || "Red Chili",
         planting_date: overrides.planting_date || "2024-01-15",

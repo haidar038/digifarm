@@ -6,11 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { LocationSelect } from "@/components/auth/LocationSelect";
 import { useAuth } from "@/contexts/auth-context";
+import { useRole } from "@/hooks/useRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Calendar, Shield } from "lucide-react";
+import { Role } from "@/types/auth";
+import { format } from "date-fns";
+import { id as localeId } from "date-fns/locale";
 
 // Schema validation
 const profileSchema = z.object({
@@ -28,8 +34,22 @@ const profileSchema = z.object({
 
 type ProfileValues = z.infer<typeof profileSchema>;
 
+// Helper to get role badge info
+function getRoleBadgeInfo(role: Role): { variant: "default" | "secondary" | "destructive"; label: string } {
+    switch (role) {
+        case "admin":
+            return { variant: "destructive", label: "Administrator" };
+        case "manager":
+            return { variant: "default", label: "Manager" };
+        case "farmer":
+        default:
+            return { variant: "secondary", label: "Petani" };
+    }
+}
+
 export function ProfileForm() {
     const { user, profile } = useAuth();
+    const { role } = useRole();
     const [loading, setLoading] = useState(false);
 
     // Initialize form
@@ -121,13 +141,38 @@ export function ProfileForm() {
         }
     };
 
+    const roleBadge = getRoleBadgeInfo(role);
+
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Profil Saya</CardTitle>
                 <CardDescription>Kelola informasi pribadi dan lokasi lahan Anda.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
+                {/* Account Info Section */}
+                <div className="flex flex-wrap items-center gap-4 p-4 bg-muted/30 rounded-lg border">
+                    <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Role:</span>
+                        <Badge variant={roleBadge.variant}>{roleBadge.label}</Badge>
+                    </div>
+                    <Separator orientation="vertical" className="h-4 hidden sm:block" />
+                    {user?.email && (
+                        <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">{user.email}</span>
+                        </div>
+                    )}
+                    <Separator orientation="vertical" className="h-4 hidden sm:block" />
+                    {profile?.created_at && (
+                        <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">Bergabung {format(new Date(profile.created_at), "d MMMM yyyy", { locale: localeId })}</span>
+                        </div>
+                    )}
+                </div>
+
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <div className="grid gap-4 md:grid-cols-2">

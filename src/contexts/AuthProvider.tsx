@@ -147,15 +147,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const signUp = async (email: string, password: string, fullName: string) => {
+    const signUp = async (data: import("@/types/auth").SignUpData) => {
         setLoading(true);
         try {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
+            const { error } = await supabase.auth.signUp({
+                email: data.email,
+                password: data.password,
                 options: {
                     data: {
-                        full_name: fullName,
+                        // All these fields are read by the database trigger handle_new_user()
+                        full_name: data.fullName,
+                        phone: data.phone || null,
+                        province_code: data.provinceCode || null,
+                        province_name: data.provinceName || null,
+                        regency_code: data.regencyCode || null,
+                        regency_name: data.regencyName || null,
+                        district_code: data.districtCode || null,
+                        district_name: data.districtName || null,
+                        village_code: data.villageCode || null,
+                        village_name: data.villageName || null,
                     },
                 },
             });
@@ -165,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
 
             // Profile is created automatically via database trigger
-            // No need to manually insert here
+            // which reads all fields from raw_user_meta_data
 
             toast({
                 title: "Registrasi Berhasil!",

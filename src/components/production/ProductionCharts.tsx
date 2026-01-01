@@ -60,7 +60,7 @@ export function ProductionCharts({ productions }: ProductionChartsProps) {
                 <CardHeader className="pb-3">
                     <CardTitle className="text-lg">Produksi per Periode</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent id="chart-production-period">
                     {barData.length === 0 ? (
                         <div className="h-[250px] flex items-center justify-center text-muted-foreground">Belum ada data panen</div>
                     ) : (
@@ -103,14 +103,24 @@ export function ProductionCharts({ productions }: ProductionChartsProps) {
                 <CardHeader className="pb-3">
                     <CardTitle className="text-lg">Produksi per Komoditas</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent id="chart-production-commodity">
                     {pieData.length === 0 ? (
                         <div className="h-[250px] flex items-center justify-center text-muted-foreground">Belum ada data panen</div>
                     ) : (
                         <div className="h-[250px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                    <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`} labelLine={false}>
+                                    <Pie
+                                        data={pieData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={50}
+                                        outerRadius={80}
+                                        paddingAngle={2}
+                                        dataKey="value"
+                                        label={({ name, percent }) => `${translateCommodity(name)} (${(percent * 100).toFixed(0)}%)`}
+                                        labelLine={false}
+                                    >
                                         {pieData.map((_, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
@@ -121,7 +131,7 @@ export function ProductionCharts({ productions }: ProductionChartsProps) {
                                             border: "1px solid hsl(var(--border))",
                                             borderRadius: "var(--radius)",
                                         }}
-                                        formatter={(value: number) => [`${value.toFixed(1)} kg`, "Hasil"]}
+                                        formatter={(value: number, name: string) => [`${value.toFixed(1)} kg`, translateCommodity(name)]}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>

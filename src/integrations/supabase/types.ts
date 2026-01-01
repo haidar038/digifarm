@@ -51,6 +51,7 @@ export type Database = {
           scheduled_date: string | null
           status: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           activity_type: string
@@ -63,6 +64,7 @@ export type Database = {
           scheduled_date?: string | null
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           activity_type?: string
@@ -75,6 +77,7 @@ export type Database = {
           scheduled_date?: string | null
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -107,6 +110,7 @@ export type Database = {
           photos: string[]
           status: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           address?: string | null
@@ -121,6 +125,7 @@ export type Database = {
           photos?: string[]
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           address?: string | null
@@ -135,6 +140,7 @@ export type Database = {
           photos?: string[]
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -154,6 +160,7 @@ export type Database = {
           status: string
           total_cost: number | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           commodity: string
@@ -170,6 +177,7 @@ export type Database = {
           status?: string
           total_cost?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           commodity?: string
@@ -186,6 +194,7 @@ export type Database = {
           status?: string
           total_cost?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -209,7 +218,7 @@ export type Database = {
           province_name: string | null
           regency_code: string | null
           regency_name: string | null
-          role: string | null
+          role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
           village_code: string | null
           village_name: string | null
@@ -225,7 +234,7 @@ export type Database = {
           province_name?: string | null
           regency_code?: string | null
           regency_name?: string | null
-          role?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
           village_code?: string | null
           village_name?: string | null
@@ -241,7 +250,7 @@ export type Database = {
           province_name?: string | null
           regency_code?: string | null
           regency_name?: string | null
-          role?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
           village_code?: string | null
           village_name?: string | null
@@ -253,10 +262,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: never
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      is_admin: { Args: never; Returns: boolean }
+      is_manager_or_admin: { Args: never; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "farmer" | "manager" | "admin" | "observer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -386,6 +400,8 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["farmer", "manager", "admin", "observer"],
+    },
   },
 } as const

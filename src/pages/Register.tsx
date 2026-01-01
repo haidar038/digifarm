@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { LocationSelect } from "@/components/auth/LocationSelect";
 import { Loader2, Leaf, Eye, EyeOff } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface LocationData {
     provinceCode: string;
@@ -82,30 +81,22 @@ export default function Register() {
         setIsLoading(true);
 
         try {
-            // Sign up user
-            await signUp(email, password, fullName);
-
-            // Update profile with location data
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
-
-            if (user) {
-                await supabase
-                    .from("user_profiles")
-                    .update({
-                        phone,
-                        province_code: locationData.provinceCode,
-                        province_name: locationData.provinceName,
-                        regency_code: locationData.regencyCode,
-                        regency_name: locationData.regencyName,
-                        district_code: locationData.districtCode,
-                        district_name: locationData.districtName,
-                        village_code: locationData.villageCode,
-                        village_name: locationData.villageName,
-                    })
-                    .eq("id", user.id);
-            }
+            // Sign up user with all profile data
+            // The database trigger will create the profile with all fields
+            await signUp({
+                email,
+                password,
+                fullName,
+                phone: phone || undefined,
+                provinceCode: locationData.provinceCode || undefined,
+                provinceName: locationData.provinceName || undefined,
+                regencyCode: locationData.regencyCode || undefined,
+                regencyName: locationData.regencyName || undefined,
+                districtCode: locationData.districtCode || undefined,
+                districtName: locationData.districtName || undefined,
+                villageCode: locationData.villageCode || undefined,
+                villageName: locationData.villageName || undefined,
+            });
 
             navigate("/login", {
                 state: { message: "Silakan cek email Anda untuk konfirmasi." },

@@ -9,6 +9,7 @@ export interface Land {
     custom_commodity: string | null;
     photos: string[];
     status: "active" | "vacant" | "archived";
+    user_id: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -27,6 +28,7 @@ export interface Production {
     // Cost & Revenue tracking (optional)
     total_cost: number | null;
     selling_price_per_kg: number | null;
+    user_id: string | null;
     created_at: string;
     updated_at: string;
     land?: Land;
@@ -41,6 +43,7 @@ export interface Activity {
     scheduled_date: string | null;
     completed_at: string | null;
     status: "pending" | "in_progress" | "completed";
+    user_id: string | null;
     created_at: string;
     updated_at: string;
     land?: Land;
