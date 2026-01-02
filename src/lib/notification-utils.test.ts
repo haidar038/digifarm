@@ -15,25 +15,54 @@ import {
     getNotificationIcon,
     getNotificationColor,
 } from "@/lib/notification-utils";
-import { Production } from "@/types/database";
+import { Production, Land } from "@/types/database";
 import { Notification } from "@/types/notifications";
 
 // Helper function to create mock production data
-function createMockProduction(overrides: Partial<Production> = {}): Production {
+// Helper function to create mock land data
+function createMockLand(overrides: Partial<Land> = {}): Land {
     return {
-        id: overrides.id || "prod-1",
-        land_id: overrides.land_id || "land-1",
-        commodity: overrides.commodity || "Red Chili",
-        planting_date: overrides.planting_date || "2024-01-15",
-        seed_count: overrides.seed_count ?? 100,
-        estimated_harvest_date: "estimated_harvest_date" in overrides ? overrides.estimated_harvest_date : "2024-04-15",
-        harvest_date: overrides.harvest_date || null,
-        harvest_yield_kg: overrides.harvest_yield_kg ?? null,
-        status: overrides.status || "planted",
-        notes: overrides.notes || null,
+        id: overrides.id || "land-1",
+        name: overrides.name || "Test Land",
+        area_m2: overrides.area_m2 || 1000,
+        address: overrides.address || "Test Address",
+        latitude: overrides.latitude ?? -6.2,
+        longitude: overrides.longitude ?? 106.8,
+        commodities: overrides.commodities || ["Red Chili"],
+        custom_commodity: overrides.custom_commodity || null,
+        photos: overrides.photos || [],
+        status: overrides.status || "active",
+        user_id: overrides.user_id || "user-1",
         created_at: overrides.created_at || "2024-01-15T00:00:00Z",
         updated_at: overrides.updated_at || "2024-01-15T00:00:00Z",
+        created_by: overrides.created_by || "user-1",
+        updated_by: overrides.updated_by || "user-1",
     };
+}
+
+// Helper function to create mock production data
+function createMockProduction(overrides: Partial<Production> = {}): Production {
+    const defaultProduction: Production = {
+        id: "prod-1",
+        user_id: "user-1",
+        land_id: "land-1",
+        commodity: "Red Chili",
+        planting_date: "2024-01-15",
+        seed_count: 100,
+        estimated_harvest_date: "2024-04-15",
+        harvest_date: null,
+        harvest_yield_kg: null,
+        status: "planted",
+        notes: null,
+        created_at: "2024-01-15T00:00:00Z",
+        updated_at: "2024-01-15T00:00:00Z",
+        total_cost: null,
+        selling_price_per_kg: null,
+        created_by: null,
+        updated_by: null,
+    };
+
+    return { ...defaultProduction, ...overrides };
 }
 
 // Helper function to create mock notification

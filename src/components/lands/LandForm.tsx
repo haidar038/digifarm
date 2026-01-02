@@ -12,6 +12,7 @@ import { Land, COMMODITIES } from "@/types/database";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { MapSelector } from "./MapSelector";
+import { useAuth } from "@/contexts/auth-context";
 
 const formSchema = z.object({
     name: z.string().min(1, "Nama lahan wajib diisi").max(100),
@@ -30,9 +31,13 @@ interface LandFormProps {
     onOpenChange: (open: boolean) => void;
     land?: Land | null;
     onSuccess: () => void;
+    // Manager context - for CRUD on behalf of farmer
+    targetFarmerId?: string;
+    targetFarmerName?: string;
 }
 
-export function LandForm({ open, onOpenChange, land, onSuccess }: LandFormProps) {
+export function LandForm({ open, onOpenChange, land, onSuccess, targetFarmerId, targetFarmerName }: LandFormProps) {
+    const { user } = useAuth();
     const [photos, setPhotos] = useState<File[]>([]);
     const [existingPhotos, setExistingPhotos] = useState<string[]>([]);
     const [uploading, setUploading] = useState(false);
@@ -125,7 +130,7 @@ export function LandForm({ open, onOpenChange, land, onSuccess }: LandFormProps)
                 uploadedUrls.push(publicUrl);
             }
 
-            const landData = {
+            const landData: Record<string, any> = {
                 name: data.name,
                 area_m2: data.area_m2,
                 address: data.address || null,
@@ -137,12 +142,26 @@ export function LandForm({ open, onOpenChange, land, onSuccess }: LandFormProps)
                 status: "active" as const,
             };
 
+            // Set user_id for new land insertions
+            // Manager inputting on behalf of farmer: use targetFarmerId
+            // Farmer inputting own land: use current user's ID
+            if (!land) {
+                const userId = targetFarmerId || user?.id;
+                if (!userId) {
+                    throw new Error("Sesi tidak valid. Silakan login kembali.");
+                }
+                landData.user_id = userId;
+            }
+
             if (land) {
-                const { error } = await supabase.from("lands").update(landData).eq("id", land.id);
+                const { error } = await supabase
+                    .from("lands")
+                    .update(landData as any)
+                    .eq("id", land.id);
                 if (error) throw error;
                 toast({ title: "Lahan berhasil diperbarui" });
             } else {
-                const { error } = await supabase.from("lands").insert(landData);
+                const { error } = await supabase.from("lands").insert(landData as any);
                 if (error) throw error;
                 toast({ title: "Lahan berhasil ditambahkan" });
             }
@@ -170,7 +189,10 @@ export function LandForm({ open, onOpenChange, land, onSuccess }: LandFormProps)
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{land ? "Edit Lahan" : "Tambah Lahan Baru"}</DialogTitle>
+                    <DialogTitle>
+                        {land ? "Edit Lahan" : "Tambah Lahan Baru"}
+                        {targetFarmerName && <span className="block text-sm font-normal text-muted-foreground mt-1">Atas nama: {targetFarmerName}</span>}
+                    </DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

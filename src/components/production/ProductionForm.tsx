@@ -40,9 +40,12 @@ interface ProductionFormProps {
     lands: Land[];
     productions?: Production[];
     onSuccess: () => void;
+    // Manager context - for CRUD on behalf of farmer
+    targetFarmerId?: string;
+    targetFarmerName?: string;
 }
 
-export function ProductionForm({ open, onOpenChange, production, lands, productions = [], onSuccess }: ProductionFormProps) {
+export function ProductionForm({ open, onOpenChange, production, lands, productions = [], onSuccess, targetFarmerId, targetFarmerName }: ProductionFormProps) {
     const [showCustom, setShowCustom] = useState(false);
 
     const form = useForm<FormData>({
@@ -116,7 +119,7 @@ export function ProductionForm({ open, onOpenChange, production, lands, producti
         try {
             const commodity = data.commodity === "Others" && data.custom_commodity ? data.custom_commodity : data.commodity;
 
-            const productionData = {
+            const productionData: Record<string, any> = {
                 land_id: data.land_id,
                 commodity,
                 planting_date: data.planting_date,
@@ -129,6 +132,11 @@ export function ProductionForm({ open, onOpenChange, production, lands, producti
                 total_cost: null as number | null,
                 selling_price_per_kg: null as number | null,
             };
+
+            // If manager is inputting on behalf of farmer, set user_id to farmer
+            if (targetFarmerId && !production) {
+                productionData.user_id = targetFarmerId;
+            }
 
             // If editing, preserve or update harvest data and status
             if (production) {
@@ -150,11 +158,14 @@ export function ProductionForm({ open, onOpenChange, production, lands, producti
             }
 
             if (production) {
-                const { error } = await supabase.from("productions").update(productionData).eq("id", production.id);
+                const { error } = await supabase
+                    .from("productions")
+                    .update(productionData as any)
+                    .eq("id", production.id);
                 if (error) throw error;
                 toast({ title: "Produksi berhasil diperbarui" });
             } else {
-                const { error } = await supabase.from("productions").insert(productionData);
+                const { error } = await supabase.from("productions").insert(productionData as any);
                 if (error) throw error;
                 toast({ title: "Produksi berhasil ditambahkan" });
             }
@@ -174,7 +185,10 @@ export function ProductionForm({ open, onOpenChange, production, lands, producti
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{production ? "Edit Produksi" : "Tambah Produksi Baru"}</DialogTitle>
+                    <DialogTitle>
+                        {production ? "Edit Produksi" : "Tambah Produksi Baru"}
+                        {targetFarmerName && <span className="block text-sm font-normal text-muted-foreground mt-1">Atas nama: {targetFarmerName}</span>}
+                    </DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

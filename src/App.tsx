@@ -27,12 +27,21 @@ import NotFound from "./pages/NotFound";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminLands from "./pages/admin/AdminLands";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminConnections from "./pages/admin/AdminConnections";
 
 // Observer pages
 import ObserverDashboard from "./pages/observer/ObserverDashboard";
 import ObserverFarmers from "./pages/observer/ObserverFarmers";
 import ObserverFarmerDetail from "./pages/observer/ObserverFarmerDetail";
 import ObserverExport from "./pages/observer/ObserverExport";
+
+// Manager pages
+import ManagerDashboard from "./pages/manager/ManagerDashboard";
+import ManagerFarmers from "./pages/manager/ManagerFarmers";
+import ManagerFarmerDetail from "./pages/manager/ManagerFarmerDetail";
+import ManagerConnections from "./pages/manager/ManagerConnections";
+import ManagerAnalytics from "./pages/manager/ManagerAnalytics";
+import ManagerWeather from "./pages/manager/ManagerWeather";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -51,7 +60,7 @@ const queryClient = new QueryClient({
 
 // Component to redirect users to their respective panels based on role
 function RoleBasedHome() {
-    const { isAdmin, isObserver } = useRole();
+    const { isAdmin, isObserver, isManager } = useRole();
 
     // Admin goes to admin panel
     if (isAdmin) {
@@ -63,7 +72,12 @@ function RoleBasedHome() {
         return <Navigate to="/observer" replace />;
     }
 
-    // Farmers and managers go to farmer dashboard
+    // Manager goes to manager panel
+    if (isManager) {
+        return <Navigate to="/manager" replace />;
+    }
+
+    // Farmers go to farmer dashboard
     return <Index />;
 }
 
@@ -158,6 +172,14 @@ const App = () => (
                                     </ProtectedRoute>
                                 }
                             />
+                            <Route
+                                path="/admin/connections"
+                                element={
+                                    <ProtectedRoute requiredRole="admin">
+                                        <AdminConnections />
+                                    </ProtectedRoute>
+                                }
+                            />
 
                             {/* Observer routes */}
                             <Route
@@ -189,6 +211,56 @@ const App = () => (
                                 element={
                                     <ProtectedRoute requiredRole="observer">
                                         <ObserverExport />
+                                    </ProtectedRoute>
+                                }
+                            />
+
+                            {/* Manager routes */}
+                            <Route
+                                path="/manager"
+                                element={
+                                    <ProtectedRoute requiredRole="manager">
+                                        <ManagerDashboard />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/manager/farmers"
+                                element={
+                                    <ProtectedRoute requiredRole="manager">
+                                        <ManagerFarmers />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/manager/farmers/:id"
+                                element={
+                                    <ProtectedRoute requiredRole="manager">
+                                        <ManagerFarmerDetail />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/manager/connections"
+                                element={
+                                    <ProtectedRoute requiredRole="manager">
+                                        <ManagerConnections />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/manager/analytics"
+                                element={
+                                    <ProtectedRoute requiredRole="manager">
+                                        <ManagerAnalytics />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/manager/weather"
+                                element={
+                                    <ProtectedRoute requiredRole="manager">
+                                        <ManagerWeather />
                                     </ProtectedRoute>
                                 }
                             />

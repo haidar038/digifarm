@@ -1,26 +1,34 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ObserverLayout } from "@/components/layout/ObserverLayout";
+import { ManagerLayout } from "@/components/layout/ManagerLayout";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { SecurityForm } from "@/components/profile/SecurityForm";
+import { MyManagerSection } from "@/components/profile/MyManagerSection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Shield } from "lucide-react";
+import { User, Shield, Link2 } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
 
 export default function Profile() {
-    const { isAdmin, isObserver } = useRole();
+    const { isAdmin, isObserver, isManager, isFarmer } = useRole();
 
     const content = (
         <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsList className={`grid w-full max-w-md ${isFarmer ? "grid-cols-3" : "grid-cols-2"}`}>
                 <TabsTrigger value="profile" className="flex items-center gap-2">
                     <User className="h-4 w-4" />
                     Profil Saya
                 </TabsTrigger>
                 <TabsTrigger value="security" className="flex items-center gap-2">
                     <Shield className="h-4 w-4" />
-                    Keamanan Akun
+                    Keamanan
                 </TabsTrigger>
+                {isFarmer && (
+                    <TabsTrigger value="manager" className="flex items-center gap-2">
+                        <Link2 className="h-4 w-4" />
+                        Manager
+                    </TabsTrigger>
+                )}
             </TabsList>
 
             <TabsContent value="profile" className="mt-6">
@@ -30,6 +38,12 @@ export default function Profile() {
             <TabsContent value="security" className="mt-6">
                 <SecurityForm />
             </TabsContent>
+
+            {isFarmer && (
+                <TabsContent value="manager" className="mt-6">
+                    <MyManagerSection />
+                </TabsContent>
+            )}
         </Tabs>
     );
 
@@ -51,7 +65,16 @@ export default function Profile() {
         );
     }
 
-    // Farmer/Manager uses DashboardLayout
+    // Manager uses ManagerLayout
+    if (isManager) {
+        return (
+            <ManagerLayout title="Profil Pengguna" description="Kelola profil pribadi dan keamanan akun Anda">
+                {content}
+            </ManagerLayout>
+        );
+    }
+
+    // Farmer uses DashboardLayout
     return (
         <DashboardLayout title="Profil Pengguna">
             <div className="space-y-6">

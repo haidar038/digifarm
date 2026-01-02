@@ -32,6 +32,9 @@ function createMockProduction(overrides: Partial<Production> = {}): Production {
         selling_price_per_kg: overrides.selling_price_per_kg ?? null,
         created_at: overrides.created_at || "2024-01-15T00:00:00Z",
         updated_at: overrides.updated_at || "2024-01-15T00:00:00Z",
+        // Audit trail fields
+        created_by: overrides.created_by || null,
+        updated_by: overrides.updated_by || null,
     };
 }
 

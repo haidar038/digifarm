@@ -19,6 +19,8 @@ function getRoleBadgeVariant(role: Role): "default" | "secondary" | "destructive
             return "destructive";
         case "manager":
             return "default";
+        case "observer":
+            return "outline";
         case "farmer":
         default:
             return "secondary";
@@ -32,6 +34,8 @@ function getRoleLabel(role: Role): string {
             return "Admin";
         case "manager":
             return "Manager";
+        case "observer":
+            return "Observer";
         case "farmer":
         default:
             return "Petani";
@@ -104,6 +108,7 @@ export function UserTable({ users, onRoleChange }: UserTableProps) {
                                             <SelectContent>
                                                 <SelectItem value="farmer">Petani</SelectItem>
                                                 <SelectItem value="manager">Manager</SelectItem>
+                                                <SelectItem value="observer">Observer</SelectItem>
                                                 <SelectItem value="admin">Admin</SelectItem>
                                             </SelectContent>
                                         </Select>

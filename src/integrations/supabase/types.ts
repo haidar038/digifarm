@@ -44,6 +44,7 @@ export type Database = {
           activity_type: string
           completed_at: string | null
           created_at: string
+          created_by: string | null
           description: string
           id: string
           land_id: string | null
@@ -51,12 +52,14 @@ export type Database = {
           scheduled_date: string | null
           status: string
           updated_at: string
+          updated_by: string | null
           user_id: string | null
         }
         Insert: {
           activity_type: string
           completed_at?: string | null
           created_at?: string
+          created_by?: string | null
           description: string
           id?: string
           land_id?: string | null
@@ -64,12 +67,14 @@ export type Database = {
           scheduled_date?: string | null
           status?: string
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
         }
         Update: {
           activity_type?: string
           completed_at?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string
           id?: string
           land_id?: string | null
@@ -77,9 +82,17 @@ export type Database = {
           scheduled_date?: string | null
           status?: string
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "activities_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "activities_land_id_fkey"
             columns: ["land_id"]
@@ -94,6 +107,71 @@ export type Database = {
             referencedRelation: "productions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "activities_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connection_revoke_requests: {
+        Row: {
+          connection_id: string
+          created_at: string | null
+          id: string
+          reason: string | null
+          requested_by: string
+          responded_at: string | null
+          responded_by: string | null
+          response_note: string | null
+          status: string | null
+        }
+        Insert: {
+          connection_id: string
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          requested_by: string
+          responded_at?: string | null
+          responded_by?: string | null
+          response_note?: string | null
+          status?: string | null
+        }
+        Update: {
+          connection_id?: string
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          requested_by?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          response_note?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_revoke_requests_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "manager_farmer_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connection_revoke_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connection_revoke_requests_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       lands: {
@@ -102,6 +180,7 @@ export type Database = {
           area_m2: number
           commodities: string[]
           created_at: string
+          created_by: string | null
           custom_commodity: string | null
           id: string
           latitude: number | null
@@ -110,6 +189,7 @@ export type Database = {
           photos: string[]
           status: string
           updated_at: string
+          updated_by: string | null
           user_id: string | null
         }
         Insert: {
@@ -117,6 +197,7 @@ export type Database = {
           area_m2: number
           commodities?: string[]
           created_at?: string
+          created_by?: string | null
           custom_commodity?: string | null
           id?: string
           latitude?: number | null
@@ -125,6 +206,7 @@ export type Database = {
           photos?: string[]
           status?: string
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
         }
         Update: {
@@ -132,6 +214,7 @@ export type Database = {
           area_m2?: number
           commodities?: string[]
           created_at?: string
+          created_by?: string | null
           custom_commodity?: string | null
           id?: string
           latitude?: number | null
@@ -140,14 +223,108 @@ export type Database = {
           photos?: string[]
           status?: string
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lands_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lands_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manager_farmer_connections: {
+        Row: {
+          connection_type: Database["public"]["Enums"]["connection_type"]
+          created_at: string | null
+          created_by: string
+          farmer_id: string
+          id: string
+          manager_id: string
+          request_note: string | null
+          responded_at: string | null
+          response_note: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          status: Database["public"]["Enums"]["connection_status"]
+          updated_at: string | null
+        }
+        Insert: {
+          connection_type: Database["public"]["Enums"]["connection_type"]
+          created_at?: string | null
+          created_by: string
+          farmer_id: string
+          id?: string
+          manager_id: string
+          request_note?: string | null
+          responded_at?: string | null
+          response_note?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: Database["public"]["Enums"]["connection_status"]
+          updated_at?: string | null
+        }
+        Update: {
+          connection_type?: Database["public"]["Enums"]["connection_type"]
+          created_at?: string | null
+          created_by?: string
+          farmer_id?: string
+          id?: string
+          manager_id?: string
+          request_note?: string | null
+          responded_at?: string | null
+          response_note?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: Database["public"]["Enums"]["connection_status"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_farmer_connections_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "manager_farmer_connections_farmer_id_fkey"
+            columns: ["farmer_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "manager_farmer_connections_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "manager_farmer_connections_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       productions: {
         Row: {
           commodity: string
           created_at: string
+          created_by: string | null
           estimated_harvest_date: string | null
           harvest_date: string | null
           harvest_yield_kg: number | null
@@ -160,11 +337,13 @@ export type Database = {
           status: string
           total_cost: number | null
           updated_at: string
+          updated_by: string | null
           user_id: string | null
         }
         Insert: {
           commodity: string
           created_at?: string
+          created_by?: string | null
           estimated_harvest_date?: string | null
           harvest_date?: string | null
           harvest_yield_kg?: number | null
@@ -177,11 +356,13 @@ export type Database = {
           status?: string
           total_cost?: number | null
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
         }
         Update: {
           commodity?: string
           created_at?: string
+          created_by?: string | null
           estimated_harvest_date?: string | null
           harvest_date?: string | null
           harvest_yield_kg?: number | null
@@ -194,14 +375,29 @@ export type Database = {
           status?: string
           total_cost?: number | null
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "productions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "productions_land_id_fkey"
             columns: ["land_id"]
             isOneToOne: false
             referencedRelation: "lands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "productions_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -262,14 +458,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_manager_crud_farmer: {
+        Args: { farmer_uuid: string }
+        Returns: boolean
+      }
+      get_farmer_manager: { Args: { farmer_uuid: string }; Returns: string }
       get_user_role: {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
       }
       is_admin: { Args: never; Returns: boolean }
+      is_connected_manager: { Args: { farmer_uuid: string }; Returns: boolean }
       is_manager_or_admin: { Args: never; Returns: boolean }
     }
     Enums: {
+      connection_status: "pending" | "active" | "rejected" | "revoked"
+      connection_type: "admin_assigned" | "manager_requested"
       user_role: "farmer" | "manager" | "admin" | "observer"
     }
     CompositeTypes: {
@@ -401,6 +605,8 @@ export const Constants = {
   },
   public: {
     Enums: {
+      connection_status: ["pending", "active", "rejected", "revoked"],
+      connection_type: ["admin_assigned", "manager_requested"],
       user_role: ["farmer", "manager", "admin", "observer"],
     },
   },
