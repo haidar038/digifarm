@@ -32,6 +32,7 @@ export interface UserProfile {
     district_name?: string;
     village_code?: string;
     village_name?: string;
+    must_change_password?: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -61,6 +62,7 @@ export interface AuthContextType {
     signUp: (data: SignUpData) => Promise<void>;
     signOut: () => Promise<void>;
     resetPassword: (email: string) => Promise<void>;
+    refreshProfile: () => Promise<void>;
 }
 
 export interface LocationData {

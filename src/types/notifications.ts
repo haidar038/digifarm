@@ -41,7 +41,7 @@ export interface ReminderConfig {
 }
 
 export const DEFAULT_REMINDER_CONFIG: ReminderConfig = {
-    harvestReminderDays: [7, 3, 1],
+    harvestReminderDays: [7, 3, 1, 0],
     fertilizationIntervalDays: 14,
     skipWateringHumidityThreshold: 70,
 };

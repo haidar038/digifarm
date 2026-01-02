@@ -11,13 +11,14 @@ import { handleError } from "@/lib/error-utils";
 
 // Auth pages
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import ForcePasswordChange from "./pages/ForcePasswordChange";
 
 // Protected pages (Farmer/Manager)
 import Index from "./pages/Index";
 import Lands from "./pages/Lands";
 import Production from "./pages/Production";
+import Planning from "./pages/Planning";
 import Weather from "./pages/Weather";
 import Profile from "./pages/Profile";
 import Analytics from "./pages/Analytics";
@@ -28,12 +29,14 @@ import AdminOverview from "./pages/admin/AdminOverview";
 import AdminLands from "./pages/admin/AdminLands";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminConnections from "./pages/admin/AdminConnections";
+import AdminAuditLog from "./pages/admin/AdminAuditLog";
 
 // Observer pages
 import ObserverDashboard from "./pages/observer/ObserverDashboard";
 import ObserverFarmers from "./pages/observer/ObserverFarmers";
 import ObserverFarmerDetail from "./pages/observer/ObserverFarmerDetail";
 import ObserverExport from "./pages/observer/ObserverExport";
+import ObserverManagers from "./pages/observer/ObserverManagers";
 
 // Manager pages
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
@@ -92,8 +95,8 @@ const App = () => (
                         <Routes>
                             {/* Public routes */}
                             <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
                             <Route path="/forgot-password" element={<ForgotPassword />} />
+                            <Route path="/change-password" element={<ForcePasswordChange />} />
 
                             {/* Role-based home redirect */}
                             <Route
@@ -119,6 +122,14 @@ const App = () => (
                                 element={
                                     <ProtectedRoute>
                                         <Production />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/planning"
+                                element={
+                                    <ProtectedRoute>
+                                        <Planning />
                                     </ProtectedRoute>
                                 }
                             />
@@ -180,6 +191,14 @@ const App = () => (
                                     </ProtectedRoute>
                                 }
                             />
+                            <Route
+                                path="/admin/audit-log"
+                                element={
+                                    <ProtectedRoute requiredRole="admin">
+                                        <AdminAuditLog />
+                                    </ProtectedRoute>
+                                }
+                            />
 
                             {/* Observer routes */}
                             <Route
@@ -211,6 +230,14 @@ const App = () => (
                                 element={
                                     <ProtectedRoute requiredRole="observer">
                                         <ObserverExport />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/observer/managers"
+                                element={
+                                    <ProtectedRoute requiredRole="observer">
+                                        <ObserverManagers />
                                     </ProtectedRoute>
                                 }
                             />

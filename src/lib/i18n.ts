@@ -3,6 +3,14 @@ import { initReactI18next } from "react-i18next";
 
 // Commodity translation mapping
 const commodityTranslations: Record<string, string> = {
+    // Indonesian names (primary)
+    "Cabai Merah": "Cabai Merah",
+    "Cabai Rawit": "Cabai Rawit",
+    Tomat: "Tomat",
+    "Bawang Merah": "Bawang Merah",
+    "Bawang Putih": "Bawang Putih",
+    Lainnya: "Lainnya",
+    // Legacy English names (backward compatibility)
     "Red Chili": "Cabai Merah",
     "Rawit Chili": "Cabai Rawit",
     Tomatoes: "Tomat",

@@ -102,7 +102,7 @@ export function LandDetails({ land, open, onOpenChange, onEdit }: LandDetailsPro
                                 <div className="flex flex-wrap gap-2">
                                     {land.commodities.map((commodity) => (
                                         <Badge key={commodity} variant="secondary">
-                                            {translateCommodity(commodity === "Others" && land.custom_commodity ? land.custom_commodity : commodity)}
+                                            {translateCommodity(commodity === "Lainnya" && land.custom_commodity ? land.custom_commodity : commodity)}
                                         </Badge>
                                     ))}
                                 </div>

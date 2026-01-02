@@ -3,6 +3,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AnalyticsMetrics } from "@/components/analytics/AnalyticsMetrics";
 import { LandComparisonChart } from "@/components/analytics/LandComparisonChart";
 import { CostRevenueChart } from "@/components/analytics/CostRevenueChart";
+import { ProfitLossTrend } from "@/components/analytics/ProfitLossTrend";
 import { ProductivityChart } from "@/components/overview/ProductivityChart";
 import { ProductionCharts } from "@/components/production/ProductionCharts";
 import { Button } from "@/components/ui/button";
@@ -116,7 +117,7 @@ export default function Analytics() {
                     {/* Export Button */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" disabled={exporting}>
+                            <Button variant="outline" disabled={exporting} className="bg-white">
                                 {exporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
                                 Ekspor Laporan
                             </Button>
@@ -146,6 +147,9 @@ export default function Analytics() {
                         <CostRevenueChart data={commodityStats} />
                     </div>
                 </div>
+
+                {/* Profit/Loss Trend (Full Width) */}
+                <ProfitLossTrend productions={productions} />
 
                 {/* Productivity Trend (Full Width) */}
                 <ProductivityChart productions={productions} />

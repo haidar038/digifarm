@@ -116,6 +116,54 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: Database["public"]["Enums"]["audit_action"]
+          changes: Json | null
+          created_at: string | null
+          id: string
+          ip_address: unknown
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+          user_role: string | null
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["audit_action"]
+          changes?: Json | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_role?: string | null
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["audit_action"]
+          changes?: Json | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_role?: string | null
+        }
+        Relationships: []
+      }
       connection_revoke_requests: {
         Row: {
           connection_id: string
@@ -409,6 +457,7 @@ export type Database = {
           district_name: string | null
           full_name: string
           id: string
+          must_change_password: boolean | null
           phone: string | null
           province_code: string | null
           province_name: string | null
@@ -425,6 +474,7 @@ export type Database = {
           district_name?: string | null
           full_name: string
           id: string
+          must_change_password?: boolean | null
           phone?: string | null
           province_code?: string | null
           province_name?: string | null
@@ -441,6 +491,7 @@ export type Database = {
           district_name?: string | null
           full_name?: string
           id?: string
+          must_change_password?: boolean | null
           phone?: string | null
           province_code?: string | null
           province_name?: string | null
@@ -469,9 +520,13 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_connected_manager: { Args: { farmer_uuid: string }; Returns: boolean }
+      is_manager_admin_or_observer: { Args: never; Returns: boolean }
       is_manager_or_admin: { Args: never; Returns: boolean }
+      is_observer: { Args: never; Returns: boolean }
+      jsonb_diff: { Args: { new_data: Json; old_data: Json }; Returns: Json }
     }
     Enums: {
+      audit_action: "create" | "update" | "delete"
       connection_status: "pending" | "active" | "rejected" | "revoked"
       connection_type: "admin_assigned" | "manager_requested"
       user_role: "farmer" | "manager" | "admin" | "observer"
@@ -605,6 +660,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      audit_action: ["create", "update", "delete"],
       connection_status: ["pending", "active", "rejected", "revoked"],
       connection_type: ["admin_assigned", "manager_requested"],
       user_role: ["farmer", "manager", "admin", "observer"],

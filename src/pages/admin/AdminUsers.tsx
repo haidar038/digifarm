@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { UserTable } from "@/components/admin/UserTable";
+import { CreateUserDialog } from "@/components/admin/CreateUserDialog";
+import { EditUserDialog } from "@/components/admin/EditUserDialog";
+import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,6 +18,11 @@ export default function AdminUsers() {
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState<Role | "all">("all");
 
+    // Dialog states
+    const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -26,10 +34,11 @@ export default function AdminUsers() {
 
             if (error) throw error;
             setUsers(data as UserProfile[]);
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan";
             toast({
                 title: "Gagal memuat pengguna",
-                description: error.message,
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -50,13 +59,30 @@ export default function AdminUsers() {
                 title: "Role berhasil diubah",
                 description: `Role pengguna telah diubah menjadi ${newRole}`,
             });
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan";
             toast({
                 title: "Gagal mengubah role",
-                description: error.message,
+                description: errorMessage,
                 variant: "destructive",
             });
         }
+    };
+
+    const handleEdit = (user: UserProfile) => {
+        setSelectedUser(user);
+        setEditDialogOpen(true);
+    };
+
+    const handleDelete = (user: UserProfile) => {
+        setSelectedUser(user);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleResetPassword = (user: UserProfile) => {
+        // Open edit dialog with reset password pre-enabled
+        setSelectedUser(user);
+        setEditDialogOpen(true);
     };
 
     // Filter users based on search and role
@@ -114,14 +140,17 @@ export default function AdminUsers() {
 
                 {/* Filters */}
                 <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Users className="h-5 w-5" />
-                            Daftar Pengguna
-                        </CardTitle>
-                        <CardDescription>
-                            {filteredUsers.length} dari {users.length} pengguna
-                        </CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                        <div>
+                            <CardTitle className="flex items-center gap-2">
+                                <Users className="h-5 w-5" />
+                                Daftar Pengguna
+                            </CardTitle>
+                            <CardDescription>
+                                {filteredUsers.length} dari {users.length} pengguna
+                            </CardDescription>
+                        </div>
+                        <CreateUserDialog onSuccess={fetchUsers} />
                     </CardHeader>
                     <CardContent>
                         <div className="flex flex-col sm:flex-row gap-4 mb-4">
@@ -148,11 +177,17 @@ export default function AdminUsers() {
                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                             </div>
                         ) : (
-                            <UserTable users={filteredUsers} onRoleChange={handleRoleChange} />
+                            <UserTable users={filteredUsers} onRoleChange={handleRoleChange} onEdit={handleEdit} onDelete={handleDelete} onResetPassword={handleResetPassword} />
                         )}
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Edit User Dialog */}
+            <EditUserDialog user={selectedUser} open={editDialogOpen} onOpenChange={setEditDialogOpen} onSuccess={fetchUsers} />
+
+            {/* Delete User Dialog */}
+            <DeleteUserDialog user={selectedUser} open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onSuccess={fetchUsers} />
         </AdminLayout>
     );
 }

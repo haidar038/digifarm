@@ -289,7 +289,7 @@ export function ImportExport({ productions, lands, onImportSuccess }: ImportExpo
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" className="bg-white" size="sm">
                         <Upload className="w-4 h-4 mr-2" />
                         Impor
                     </Button>
@@ -308,7 +308,7 @@ export function ImportExport({ productions, lands, onImportSuccess }: ImportExpo
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" className="bg-white" size="sm">
                         <Download className="w-4 h-4 mr-2" />
                         Ekspor
                     </Button>

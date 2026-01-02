@@ -68,7 +68,7 @@ export function LandForm({ open, onOpenChange, land, onSuccess, targetFarmerId, 
                 custom_commodity: land.custom_commodity || "",
             });
             setExistingPhotos(land.photos || []);
-            setShowCustom(land.commodities.includes("Others"));
+            setShowCustom(land.commodities.includes("Lainnya"));
         } else {
             form.reset({
                 name: "",
@@ -137,7 +137,7 @@ export function LandForm({ open, onOpenChange, land, onSuccess, targetFarmerId, 
                 latitude: data.latitude || null,
                 longitude: data.longitude || null,
                 commodities: data.commodities,
-                custom_commodity: data.commodities.includes("Others") ? data.custom_commodity : null,
+                custom_commodity: data.commodities.includes("Lainnya") ? data.custom_commodity : null,
                 photos: uploadedUrls,
                 status: "active" as const,
             };
@@ -182,7 +182,7 @@ export function LandForm({ open, onOpenChange, land, onSuccess, targetFarmerId, 
     const watchCommodities = form.watch("commodities");
 
     useEffect(() => {
-        setShowCustom(watchCommodities.includes("Others"));
+        setShowCustom(watchCommodities.includes("Lainnya"));
     }, [watchCommodities]);
 
     return (

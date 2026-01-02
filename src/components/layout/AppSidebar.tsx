@@ -1,4 +1,4 @@
-import { LayoutDashboard, Map, Sprout, Cloud, LogOut, User, BarChart3, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Map, Sprout, Cloud, LogOut, User, BarChart3, ChevronDown, CalendarDays } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/auth-context";
 import { useRole } from "@/hooks/useRole";
@@ -19,6 +19,7 @@ const menuItems: MenuItem[] = [
     { title: "Ringkasan", url: "/", icon: LayoutDashboard },
     { title: "Manajemen Lahan", url: "/lands", icon: Map },
     { title: "Produksi", url: "/production", icon: Sprout },
+    { title: "Perencanaan", url: "/planning", icon: CalendarDays },
     { title: "Analitik", url: "/analytics", icon: BarChart3 },
     { title: "Cuaca", url: "/weather", icon: Cloud },
 ];

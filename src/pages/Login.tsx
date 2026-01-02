@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,12 +70,7 @@ export default function Login() {
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Masuk
                         </Button>
-                        <p className="text-sm text-muted-foreground text-center">
-                            Belum punya akun?{" "}
-                            <Link to="/register" className="text-primary hover:underline">
-                                Daftar sekarang
-                            </Link>
-                        </p>
+                        <p className="text-sm text-muted-foreground text-center">Belum punya akun? Hubungi admin untuk mendapat akses.</p>
                     </CardFooter>
                 </form>
             </Card>

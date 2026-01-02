@@ -107,8 +107,15 @@ export async function generateAnalyticsPDF(data: ReportData): Promise<void> {
                 });
                 const imgData = canvas.toDataURL("image/png");
                 const aspectRatio = canvas.height / canvas.width;
-                const imgWidth = pageWidth - margin * 2;
-                const imgHeight = Math.min(imgWidth * aspectRatio, 85);
+                const maxHeight = 85;
+                let imgWidth = pageWidth - margin * 2;
+                let imgHeight = imgWidth * aspectRatio;
+
+                // If height exceeds max, scale down proportionally to maintain aspect ratio
+                if (imgHeight > maxHeight) {
+                    imgHeight = maxHeight;
+                    imgWidth = imgHeight / aspectRatio;
+                }
 
                 doc.setFontSize(12);
                 doc.setFont("helvetica", "bold");

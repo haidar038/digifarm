@@ -241,6 +241,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    // Refresh profile from database (useful after profile updates)
+    const refreshProfile = useCallback(async () => {
+        if (user) {
+            const updatedProfile = await fetchProfile(user.id);
+            setProfile(updatedProfile);
+        }
+    }, [user, fetchProfile]);
+
     const value: AuthContextType = {
         user,
         session,
@@ -250,6 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signOut,
         resetPassword,
+        refreshProfile,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

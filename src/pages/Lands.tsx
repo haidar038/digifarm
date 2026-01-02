@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LandForm } from "@/components/lands/LandForm";
 import { LandDetails } from "@/components/lands/LandDetails";
@@ -9,6 +9,7 @@ import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Land } from "@/types/database";
 import { toast } from "@/hooks/use-toast";
+import { useRealtimeRefresh } from "@/hooks/useRealtimeSubscription";
 
 const LandsPage = () => {
     const [lands, setLands] = useState<Land[]>([]);
@@ -18,11 +19,7 @@ const LandsPage = () => {
     const [deletingLand, setDeletingLand] = useState<Land | null>(null);
     const [viewingLand, setViewingLand] = useState<Land | null>(null);
 
-    useEffect(() => {
-        fetchLands();
-    }, []);
-
-    const fetchLands = async () => {
+    const fetchLands = useCallback(async () => {
         try {
             const { data, error } = await supabase.from("lands").select("*").order("created_at", { ascending: false });
 
@@ -33,7 +30,14 @@ const LandsPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchLands();
+    }, [fetchLands]);
+
+    // Real-time subscription for lands table
+    useRealtimeRefresh("lands", fetchLands);
 
     const handleEdit = (land: Land) => {
         setEditingLand(land);

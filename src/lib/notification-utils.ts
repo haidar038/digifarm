@@ -48,11 +48,17 @@ export function generateHarvestReminders(productions: Production[], currentDate:
         // Check if days until harvest matches any reminder day
         config.harvestReminderDays.forEach((reminderDay) => {
             if (daysUntil === reminderDay) {
+                const getMessage = () => {
+                    if (daysUntil === 0) return `🌾 ${production.commodity} siap dipanen hari ini!`;
+                    if (daysUntil === 1) return `${production.commodity} akan siap panen besok!`;
+                    return `${production.commodity} akan siap panen dalam ${daysUntil} hari.`;
+                };
+
                 notifications.push({
                     id: generateNotificationId("harvest_reminder", production.id, `${daysUntil}d`),
                     type: "harvest_reminder",
-                    title: `Persiapan Panen: ${production.commodity}`,
-                    message: daysUntil === 1 ? `${production.commodity} akan siap panen besok!` : `${production.commodity} akan siap panen dalam ${daysUntil} hari.`,
+                    title: daysUntil === 0 ? `🌾 Hari Panen: ${production.commodity}` : `Persiapan Panen: ${production.commodity}`,
+                    message: getMessage(),
                     priority: getPriorityByDays(daysUntil),
                     createdAt: currentDate,
                     read: false,

@@ -78,7 +78,7 @@ export function LandsTable({ lands, onEdit, onDelete, onViewDetails, loading }: 
                                 <div className="flex flex-wrap gap-1">
                                     {land.commodities.slice(0, 2).map((c) => (
                                         <Badge key={c} variant="secondary" className="text-xs">
-                                            {translateCommodity(c === "Others" && land.custom_commodity ? land.custom_commodity : c)}
+                                            {translateCommodity(c === "Lainnya" && land.custom_commodity ? land.custom_commodity : c)}
                                         </Badge>
                                     ))}
                                     {land.commodities.length > 2 && (

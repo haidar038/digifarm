@@ -20,7 +20,7 @@ function createMockProduction(overrides: Partial<Production> = {}): Production {
         id: overrides.id || "prod-1",
         user_id: overrides.user_id || "user-1",
         land_id: overrides.land_id || "land-1",
-        commodity: overrides.commodity || "Red Chili",
+        commodity: overrides.commodity || "Cabai Merah",
         planting_date: overrides.planting_date || "2024-01-15",
         seed_count: overrides.seed_count ?? 100,
         estimated_harvest_date: overrides.estimated_harvest_date ?? "2024-04-15",
@@ -145,52 +145,52 @@ describe("formatCurrencyCompact", () => {
 
 describe("getSmartCostDefault", () => {
     it("should return average from history when available", () => {
-        const history = [createMockProduction({ commodity: "Red Chili", total_cost: 400000 }), createMockProduction({ commodity: "Red Chili", total_cost: 600000 })];
+        const history = [createMockProduction({ commodity: "Cabai Merah", total_cost: 400000 }), createMockProduction({ commodity: "Cabai Merah", total_cost: 600000 })];
 
-        const result = getSmartCostDefault("Red Chili", history);
+        const result = getSmartCostDefault("Cabai Merah", history);
 
         expect(result.value).toBe(500000);
         expect(result.source).toBe("history");
     });
 
     it("should return estimate when no history", () => {
-        const result = getSmartCostDefault("Red Chili", []);
+        const result = getSmartCostDefault("Cabai Merah", []);
 
-        expect(result.value).toBe(DEFAULT_COST_ESTIMATES["Red Chili"]);
+        expect(result.value).toBe(DEFAULT_COST_ESTIMATES["Cabai Merah"]);
         expect(result.source).toBe("estimate");
     });
 
     it("should skip null cost values in history", () => {
-        const history = [createMockProduction({ commodity: "Red Chili", total_cost: null }), createMockProduction({ commodity: "Red Chili", total_cost: 500000 })];
+        const history = [createMockProduction({ commodity: "Cabai Merah", total_cost: null }), createMockProduction({ commodity: "Cabai Merah", total_cost: 500000 })];
 
-        const result = getSmartCostDefault("Red Chili", history);
+        const result = getSmartCostDefault("Cabai Merah", history);
 
         expect(result.value).toBe(500000);
         expect(result.source).toBe("history");
     });
 
-    it("should return Others default for unknown commodity", () => {
+    it("should return Lainnya default for unknown commodity", () => {
         const result = getSmartCostDefault("Unknown Crop", []);
 
-        expect(result.value).toBe(DEFAULT_COST_ESTIMATES["Others"]);
+        expect(result.value).toBe(DEFAULT_COST_ESTIMATES["Lainnya"]);
         expect(result.source).toBe("estimate");
     });
 });
 
 describe("getSmartPriceDefault", () => {
     it("should return average from history when available", () => {
-        const history = [createMockProduction({ commodity: "Red Chili", selling_price_per_kg: 30000 }), createMockProduction({ commodity: "Red Chili", selling_price_per_kg: 40000 })];
+        const history = [createMockProduction({ commodity: "Cabai Merah", selling_price_per_kg: 30000 }), createMockProduction({ commodity: "Cabai Merah", selling_price_per_kg: 40000 })];
 
-        const result = getSmartPriceDefault("Red Chili", history);
+        const result = getSmartPriceDefault("Cabai Merah", history);
 
         expect(result.value).toBe(35000);
         expect(result.source).toBe("history");
     });
 
     it("should return estimate when no history", () => {
-        const result = getSmartPriceDefault("Rawit Chili", []);
+        const result = getSmartPriceDefault("Cabai Rawit", []);
 
-        expect(result.value).toBe(DEFAULT_PRICE_ESTIMATES["Rawit Chili"]);
+        expect(result.value).toBe(DEFAULT_PRICE_ESTIMATES["Cabai Rawit"]);
         expect(result.source).toBe("estimate");
     });
 });

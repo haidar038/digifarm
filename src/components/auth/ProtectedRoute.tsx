@@ -42,6 +42,11 @@ export function ProtectedRoute({ children, requiredRole, requiredPermission, red
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
+    // Check if user must change password (don't redirect if already on change-password page)
+    if (profile?.must_change_password && location.pathname !== "/change-password") {
+        return <Navigate to="/change-password" replace />;
+    }
+
     // Wait for profile to load before checking roles
     if (requiredRole && !profile) {
         return (

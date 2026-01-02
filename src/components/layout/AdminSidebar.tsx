@@ -1,4 +1,4 @@
-import { LayoutDashboard, Map, Users, LogOut, User, ChevronDown, Shield, Link2 } from "lucide-react";
+import { LayoutDashboard, Map, Users, LogOut, User, ChevronDown, Shield, Link2, FileText } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/auth-context";
 import { useRole } from "@/hooks/useRole";
@@ -19,6 +19,7 @@ const adminMenuItems: MenuItem[] = [
     { title: "Manajemen Lahan", url: "/admin/lands", icon: Map },
     { title: "Manajemen Pengguna", url: "/admin/users", icon: Users },
     { title: "Manajemen Koneksi", url: "/admin/connections", icon: Link2 },
+    { title: "Audit Log", url: "/admin/audit-log", icon: FileText },
 ];
 
 // Get initials from full name

@@ -14,12 +14,12 @@ export type PlantFamily = "solanaceae" | "allium" | "other";
  * Commodity to family mapping
  */
 const COMMODITY_FAMILIES: Record<string, PlantFamily> = {
-    "Red Chili": "solanaceae",
-    "Rawit Chili": "solanaceae",
-    Tomatoes: "solanaceae",
-    Shallots: "allium",
-    Garlic: "allium",
-    Others: "other",
+    "Cabai Merah": "solanaceae",
+    "Cabai Rawit": "solanaceae",
+    Tomat: "solanaceae",
+    "Bawang Merah": "allium",
+    "Bawang Putih": "allium",
+    Lainnya: "other",
 };
 
 /**
@@ -50,27 +50,27 @@ export interface RotationWarning {
  * Rotation rules: which commodities are good after which
  */
 const GOOD_SUCCESSORS: Record<string, { commodity: string; reason: string }[]> = {
-    "Red Chili": [
-        { commodity: "Shallots", reason: "Bawang mengembalikan nitrogen tanah" },
-        { commodity: "Garlic", reason: "Memutus siklus hama cabai" },
+    "Cabai Merah": [
+        { commodity: "Bawang Merah", reason: "Bawang mengembalikan nitrogen tanah" },
+        { commodity: "Bawang Putih", reason: "Memutus siklus hama cabai" },
     ],
-    "Rawit Chili": [
-        { commodity: "Shallots", reason: "Bawang mengembalikan nitrogen tanah" },
-        { commodity: "Garlic", reason: "Memutus siklus hama cabai" },
+    "Cabai Rawit": [
+        { commodity: "Bawang Merah", reason: "Bawang mengembalikan nitrogen tanah" },
+        { commodity: "Bawang Putih", reason: "Memutus siklus hama cabai" },
     ],
-    Tomatoes: [
-        { commodity: "Shallots", reason: "Allium baik setelah Solanaceae" },
-        { commodity: "Garlic", reason: "Mengurangi patogen tanah" },
+    Tomat: [
+        { commodity: "Bawang Merah", reason: "Allium baik setelah Solanaceae" },
+        { commodity: "Bawang Putih", reason: "Mengurangi patogen tanah" },
     ],
-    Shallots: [
-        { commodity: "Red Chili", reason: "Cabai tumbuh baik setelah bawang" },
-        { commodity: "Tomatoes", reason: "Solanaceae cocok setelah Allium" },
-        { commodity: "Rawit Chili", reason: "Tanah sudah diperkaya nitrogen" },
+    "Bawang Merah": [
+        { commodity: "Cabai Merah", reason: "Cabai tumbuh baik setelah bawang" },
+        { commodity: "Tomat", reason: "Solanaceae cocok setelah Allium" },
+        { commodity: "Cabai Rawit", reason: "Tanah sudah diperkaya nitrogen" },
     ],
-    Garlic: [
-        { commodity: "Red Chili", reason: "Cabai tumbuh baik setelah bawang putih" },
-        { commodity: "Tomatoes", reason: "Solanaceae cocok setelah Allium" },
-        { commodity: "Rawit Chili", reason: "Tanah sudah diperkaya nitrogen" },
+    "Bawang Putih": [
+        { commodity: "Cabai Merah", reason: "Cabai tumbuh baik setelah bawang putih" },
+        { commodity: "Tomat", reason: "Solanaceae cocok setelah Allium" },
+        { commodity: "Cabai Rawit", reason: "Tanah sudah diperkaya nitrogen" },
     ],
 };
 
@@ -90,9 +90,9 @@ export function getRotationRecommendations(lastCommodity: string | null): Rotati
     if (!lastCommodity) {
         // No history - return all as equal options
         return [
-            { commodity: "Red Chili", reason: "Komoditas populer dengan nilai tinggi", priority: "medium" },
-            { commodity: "Shallots", reason: "Permintaan pasar stabil", priority: "medium" },
-            { commodity: "Tomatoes", reason: "Siklus tanam relatif pendek", priority: "medium" },
+            { commodity: "Cabai Merah", reason: "Komoditas populer dengan nilai tinggi", priority: "medium" },
+            { commodity: "Bawang Merah", reason: "Permintaan pasar stabil", priority: "medium" },
+            { commodity: "Tomat", reason: "Siklus tanam relatif pendek", priority: "medium" },
         ];
     }
 
@@ -113,17 +113,17 @@ export function getRotationRecommendations(lastCommodity: string | null): Rotati
         const lastFamily = getCommodityFamily(lastCommodity);
         // Suggest something from a different family
         if (lastFamily === "solanaceae") {
-            if (!recommendations.find((r) => r.commodity === "Shallots")) {
+            if (!recommendations.find((r) => r.commodity === "Bawang Merah")) {
                 recommendations.push({
-                    commodity: "Shallots",
+                    commodity: "Bawang Merah",
                     reason: "Berbeda family, baik untuk rotasi",
                     priority: "medium",
                 });
             }
         } else if (lastFamily === "allium") {
-            if (!recommendations.find((r) => r.commodity === "Red Chili")) {
+            if (!recommendations.find((r) => r.commodity === "Cabai Merah")) {
                 recommendations.push({
-                    commodity: "Red Chili",
+                    commodity: "Cabai Merah",
                     reason: "Berbeda family, baik untuk rotasi",
                     priority: "medium",
                 });

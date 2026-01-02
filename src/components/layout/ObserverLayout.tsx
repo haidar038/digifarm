@@ -1,6 +1,7 @@
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { ObserverSidebar } from "./ObserverSidebar";
 import { Menu } from "lucide-react";
+import { NotificationBadge } from "@/components/notifications";
 
 interface ObserverLayoutProps {
     children: React.ReactNode;
@@ -20,8 +21,9 @@ export function ObserverLayout({ children, title, description }: ObserverLayoutP
                         </SidebarTrigger>
                         <div className="flex flex-col flex-1">
                             <h1 className="text-xl font-bold text-foreground">{title}</h1>
-                            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+                            {description && <p className="hidden md:block text-sm text-muted-foreground">{description}</p>}
                         </div>
+                        <NotificationBadge />
                     </header>
                     <main className="flex-1 p-4 lg:p-6 animate-fade-in">{children}</main>
                 </SidebarInset>

@@ -14,6 +14,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { requestConnection } from "@/lib/connection-utils";
+import { formatNumber } from "@/lib/analytics-utils";
 import type { FarmerWithStats, ConnectionStatus } from "@/types/database";
 import type { UserProfile } from "@/types/auth";
 
@@ -237,7 +238,7 @@ export default function ManagerFarmers() {
                                                         <TableCell className="text-center">
                                                             <Badge variant={farmer.active_production_count > 0 ? "default" : "secondary"}>{farmer.active_production_count} aktif</Badge>
                                                         </TableCell>
-                                                        <TableCell className="text-right font-medium">{farmer.total_yield.toLocaleString("id-ID")} kg</TableCell>
+                                                        <TableCell className="text-right font-medium">{formatNumber(farmer.total_yield)} kg</TableCell>
                                                         <TableCell>
                                                             <Button size="sm" onClick={() => navigate(`/manager/farmers/${farmer.id}`)}>
                                                                 <Eye className="h-4 w-4 mr-1" />

@@ -1,5 +1,7 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { ManagerSidebar } from "./ManagerSidebar";
+import { Menu } from "lucide-react";
+import { NotificationBadge } from "@/components/notifications";
 
 interface ManagerLayoutProps {
     children: React.ReactNode;
@@ -10,19 +12,21 @@ interface ManagerLayoutProps {
 export function ManagerLayout({ children, title, description }: ManagerLayoutProps) {
     return (
         <SidebarProvider>
-            <div className="flex min-h-screen w-full bg-gradient-to-br from-background via-background to-muted/30">
+            <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background to-muted/30">
                 <ManagerSidebar />
-                <main className="flex-1 overflow-auto">
-                    <div className="container max-w-7xl py-6 px-4 md:px-6 lg:px-8 space-y-6">
-                        {(title || description) && (
-                            <header className="space-y-2">
-                                {title && <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">{title}</h1>}
-                                {description && <p className="text-muted-foreground">{description}</p>}
-                            </header>
-                        )}
-                        {children}
-                    </div>
-                </main>
+                <SidebarInset className="flex-1">
+                    <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 lg:px-6">
+                        <SidebarTrigger className="lg:hidden">
+                            <Menu className="w-5 h-5" />
+                        </SidebarTrigger>
+                        <div className="flex flex-col flex-1">
+                            {title && <h1 className="text-xl font-bold text-foreground">{title}</h1>}
+                            {description && <p className="hidden md:block text-sm text-muted-foreground">{description}</p>}
+                        </div>
+                        <NotificationBadge />
+                    </header>
+                    <main className="flex-1 p-4 lg:p-6 animate-fade-in">{children}</main>
+                </SidebarInset>
             </div>
         </SidebarProvider>
     );

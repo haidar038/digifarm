@@ -7,7 +7,7 @@ function createMockProduction(overrides: Partial<Production> = {}): Production {
     return {
         id: overrides.id || "prod-1",
         land_id: overrides.land_id || "land-1",
-        commodity: overrides.commodity || "Red Chili",
+        commodity: overrides.commodity || "Cabai Merah",
         planting_date: overrides.planting_date || "2024-01-15",
         seed_count: overrides.seed_count ?? 100,
         estimated_harvest_date: overrides.estimated_harvest_date ?? "2024-04-15",
@@ -17,28 +17,31 @@ function createMockProduction(overrides: Partial<Production> = {}): Production {
         notes: overrides.notes || null,
         total_cost: overrides.total_cost ?? null,
         selling_price_per_kg: overrides.selling_price_per_kg ?? null,
+        user_id: overrides.user_id || "user-1",
         created_at: overrides.created_at || "2024-01-15T00:00:00Z",
         updated_at: overrides.updated_at || "2024-01-15T00:00:00Z",
+        created_by: overrides.created_by || null,
+        updated_by: overrides.updated_by || null,
     };
 }
 
 describe("getCommodityFamily", () => {
     it("should return solanaceae for chili varieties", () => {
-        expect(getCommodityFamily("Red Chili")).toBe("solanaceae");
-        expect(getCommodityFamily("Rawit Chili")).toBe("solanaceae");
+        expect(getCommodityFamily("Cabai Merah")).toBe("solanaceae");
+        expect(getCommodityFamily("Cabai Rawit")).toBe("solanaceae");
     });
 
     it("should return solanaceae for tomatoes", () => {
-        expect(getCommodityFamily("Tomatoes")).toBe("solanaceae");
+        expect(getCommodityFamily("Tomat")).toBe("solanaceae");
     });
 
     it("should return allium for onions and garlic", () => {
-        expect(getCommodityFamily("Shallots")).toBe("allium");
-        expect(getCommodityFamily("Garlic")).toBe("allium");
+        expect(getCommodityFamily("Bawang Merah")).toBe("allium");
+        expect(getCommodityFamily("Bawang Putih")).toBe("allium");
     });
 
     it("should return other for unknown commodities", () => {
-        expect(getCommodityFamily("Others")).toBe("other");
+        expect(getCommodityFamily("Lainnya")).toBe("other");
         expect(getCommodityFamily("Unknown Crop")).toBe("other");
     });
 });
@@ -49,21 +52,21 @@ describe("getLastHarvestedForLand", () => {
             createMockProduction({
                 id: "p1",
                 land_id: "land-1",
-                commodity: "Red Chili",
+                commodity: "Cabai Merah",
                 harvest_date: "2024-01-01",
                 status: "harvested",
             }),
             createMockProduction({
                 id: "p2",
                 land_id: "land-1",
-                commodity: "Shallots",
+                commodity: "Bawang Merah",
                 harvest_date: "2024-03-01",
                 status: "harvested",
             }),
             createMockProduction({
                 id: "p3",
                 land_id: "land-1",
-                commodity: "Tomatoes",
+                commodity: "Tomat",
                 harvest_date: "2024-02-01",
                 status: "harvested",
             }),
@@ -72,7 +75,7 @@ describe("getLastHarvestedForLand", () => {
         const result = getLastHarvestedForLand(productions, "land-1");
 
         expect(result?.id).toBe("p2");
-        expect(result?.commodity).toBe("Shallots");
+        expect(result?.commodity).toBe("Bawang Merah");
     });
 
     it("should return null if no harvested productions for land", () => {
@@ -93,14 +96,14 @@ describe("getLastHarvestedForLand", () => {
             createMockProduction({
                 id: "p1",
                 land_id: "land-1",
-                commodity: "Red Chili",
+                commodity: "Cabai Merah",
                 harvest_date: "2024-01-01",
                 status: "harvested",
             }),
             createMockProduction({
                 id: "p2",
                 land_id: "land-2",
-                commodity: "Shallots",
+                commodity: "Bawang Merah",
                 harvest_date: "2024-03-01",
                 status: "harvested",
             }),
@@ -109,23 +112,23 @@ describe("getLastHarvestedForLand", () => {
         const result = getLastHarvestedForLand(productions, "land-1");
 
         expect(result?.id).toBe("p1");
-        expect(result?.commodity).toBe("Red Chili");
+        expect(result?.commodity).toBe("Cabai Merah");
     });
 });
 
 describe("getRotationRecommendations", () => {
     it("should recommend allium after red chili", () => {
-        const recommendations = getRotationRecommendations("Red Chili");
+        const recommendations = getRotationRecommendations("Cabai Merah");
 
         expect(recommendations.length).toBeGreaterThan(0);
-        expect(recommendations[0].commodity).toBe("Shallots");
+        expect(recommendations[0].commodity).toBe("Bawang Merah");
         expect(recommendations[0].priority).toBe("high");
     });
 
     it("should recommend solanaceae after shallots", () => {
-        const recommendations = getRotationRecommendations("Shallots");
+        const recommendations = getRotationRecommendations("Bawang Merah");
 
-        const hasSolanaceae = recommendations.some((r) => r.commodity === "Red Chili" || r.commodity === "Tomatoes");
+        const hasSolanaceae = recommendations.some((r) => r.commodity === "Cabai Merah" || r.commodity === "Tomat");
         expect(hasSolanaceae).toBe(true);
     });
 
@@ -137,7 +140,7 @@ describe("getRotationRecommendations", () => {
     });
 
     it("should include reason for each recommendation", () => {
-        const recommendations = getRotationRecommendations("Tomatoes");
+        const recommendations = getRotationRecommendations("Tomat");
 
         recommendations.forEach((r) => {
             expect(r.reason).toBeDefined();
@@ -148,7 +151,7 @@ describe("getRotationRecommendations", () => {
 
 describe("getRotationWarnings", () => {
     it("should warn when planting same commodity consecutively", () => {
-        const warnings = getRotationWarnings("Red Chili", "Red Chili");
+        const warnings = getRotationWarnings("Cabai Merah", "Cabai Merah");
 
         expect(warnings.length).toBe(1);
         expect(warnings[0].severity).toBe("warning");
@@ -156,7 +159,7 @@ describe("getRotationWarnings", () => {
     });
 
     it("should warn when planting solanaceae after solanaceae", () => {
-        const warnings = getRotationWarnings("Tomatoes", "Red Chili");
+        const warnings = getRotationWarnings("Tomat", "Cabai Merah");
 
         expect(warnings.length).toBe(1);
         expect(warnings[0].severity).toBe("info");
@@ -164,13 +167,13 @@ describe("getRotationWarnings", () => {
     });
 
     it("should not warn for good rotation", () => {
-        const warnings = getRotationWarnings("Shallots", "Red Chili");
+        const warnings = getRotationWarnings("Bawang Merah", "Cabai Merah");
 
         expect(warnings.length).toBe(0);
     });
 
     it("should not warn when no previous commodity", () => {
-        const warnings = getRotationWarnings("Red Chili", null);
+        const warnings = getRotationWarnings("Cabai Merah", null);
 
         expect(warnings.length).toBe(0);
     });

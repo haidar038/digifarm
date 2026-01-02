@@ -149,8 +149,33 @@ export interface RegionalBreakdown {
 }
 
 // =====================================================
+// Audit Log Types
+// =====================================================
+export type AuditAction = "create" | "update" | "delete";
+
+export interface AuditLog {
+    id: string;
+    user_id: string | null;
+    user_email: string | null;
+    user_role: string | null;
+    action: AuditAction;
+    table_name: string;
+    record_id: string | null;
+    old_data: Record<string, unknown> | null;
+    new_data: Record<string, unknown> | null;
+    changes: Record<string, unknown> | null;
+    ip_address: string | null;
+    user_agent: string | null;
+    created_at: string;
+    // Joined relation
+    user?: {
+        full_name: string;
+    };
+}
+
+// =====================================================
 // Constants
 // =====================================================
-export const COMMODITIES = ["Red Chili", "Rawit Chili", "Tomatoes", "Shallots", "Garlic", "Others"] as const;
+export const COMMODITIES = ["Cabai Merah", "Cabai Rawit", "Tomat", "Bawang Merah", "Bawang Putih", "Lainnya"] as const;
 
 export type CommodityType = (typeof COMMODITIES)[number];

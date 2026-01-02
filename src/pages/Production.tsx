@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ProductionForm } from "@/components/production/ProductionForm";
 import { HarvestForm } from "@/components/production/HarvestForm";
@@ -14,6 +14,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Production, Land } from "@/types/database";
 import { toast } from "@/hooks/use-toast";
+import { useRealtimeRefresh } from "@/hooks/useRealtimeSubscription";
 
 const ProductionPage = () => {
     const [productions, setProductions] = useState<Production[]>([]);
@@ -39,11 +40,7 @@ const ProductionPage = () => {
         return applyChartFilters(productions, chartFilters) as Production[];
     }, [productions, chartFilters]);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const [productionsRes, landsRes] = await Promise.all([supabase.from("productions").select("*, land:lands(*)").order("created_at", { ascending: false }), supabase.from("lands").select("*").eq("status", "active")]);
 
@@ -54,7 +51,14 @@ const ProductionPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    // Real-time subscription for productions table
+    useRealtimeRefresh("productions", fetchData);
 
     const handleEdit = (production: Production) => {
         setEditingProduction(production);

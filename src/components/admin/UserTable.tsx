@@ -1,15 +1,20 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { UserProfile, Role } from "@/types/auth";
 import { useAuth } from "@/contexts/auth-context";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { MapPin, Phone, Calendar } from "lucide-react";
+import { MapPin, Phone, Calendar, MoreHorizontal, Pencil, Trash2, KeyRound } from "lucide-react";
 
 interface UserTableProps {
     users: UserProfile[];
     onRoleChange: (userId: string, newRole: Role) => void;
+    onEdit: (user: UserProfile) => void;
+    onDelete: (user: UserProfile) => void;
+    onResetPassword: (user: UserProfile) => void;
 }
 
 // Helper to get role badge variant
@@ -42,7 +47,7 @@ function getRoleLabel(role: Role): string {
     }
 }
 
-export function UserTable({ users, onRoleChange }: UserTableProps) {
+export function UserTable({ users, onRoleChange, onEdit, onDelete, onResetPassword }: UserTableProps) {
     const { user: currentUser } = useAuth();
 
     if (users.length === 0) {
@@ -59,6 +64,7 @@ export function UserTable({ users, onRoleChange }: UserTableProps) {
                         <TableHead>Lokasi</TableHead>
                         <TableHead>Role</TableHead>
                         <TableHead>Bergabung</TableHead>
+                        <TableHead className="w-[80px]">Aksi</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -73,6 +79,11 @@ export function UserTable({ users, onRoleChange }: UserTableProps) {
                                     {isCurrentUser && (
                                         <Badge variant="outline" className="text-xs mt-1">
                                             Anda
+                                        </Badge>
+                                    )}
+                                    {user.must_change_password && (
+                                        <Badge variant="secondary" className="text-xs mt-1 ml-1">
+                                            Harus Ganti Password
                                         </Badge>
                                     )}
                                 </TableCell>
@@ -121,6 +132,31 @@ export function UserTable({ users, onRoleChange }: UserTableProps) {
                                             locale: localeId,
                                         })}
                                     </div>
+                                </TableCell>
+                                <TableCell>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" disabled={isCurrentUser}>
+                                                <MoreHorizontal className="h-4 w-4" />
+                                                <span className="sr-only">Menu aksi</span>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={() => onEdit(user)}>
+                                                <Pencil className="mr-2 h-4 w-4" />
+                                                Edit Profil
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => onResetPassword(user)}>
+                                                <KeyRound className="mr-2 h-4 w-4" />
+                                                Reset Password
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => onDelete(user)} className="text-destructive focus:text-destructive">
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Hapus
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </TableCell>
                             </TableRow>
                         );

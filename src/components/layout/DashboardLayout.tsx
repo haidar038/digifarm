@@ -21,7 +21,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
                         </SidebarTrigger>
                         <div className="flex flex-col flex-1">
                             <h1 className="text-xl font-bold text-foreground">{title}</h1>
-                            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+                            {description && <p className="hidden md:block text-sm text-muted-foreground">{description}</p>}
                         </div>
                         <NotificationBadge />
                     </header>

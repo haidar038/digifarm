@@ -73,7 +73,7 @@ export function ProductionForm({ open, onOpenChange, production, lands, producti
             const isOther = !COMMODITIES.includes(production.commodity as any);
             form.reset({
                 land_id: production.land_id,
-                commodity: isOther ? "Others" : production.commodity,
+                commodity: isOther ? "Lainnya" : production.commodity,
                 custom_commodity: isOther ? production.commodity : "",
                 planting_date: production.planting_date,
                 seed_count: production.seed_count,
@@ -107,7 +107,7 @@ export function ProductionForm({ open, onOpenChange, production, lands, producti
     const watchLandId = form.watch("land_id");
 
     useEffect(() => {
-        setShowCustom(watchCommodity === "Others");
+        setShowCustom(watchCommodity === "Lainnya");
     }, [watchCommodity]);
 
     // Handler for rotation suggestion click
@@ -117,7 +117,7 @@ export function ProductionForm({ open, onOpenChange, production, lands, producti
 
     const onSubmit = async (data: FormData) => {
         try {
-            const commodity = data.commodity === "Others" && data.custom_commodity ? data.custom_commodity : data.commodity;
+            const commodity = data.commodity === "Lainnya" && data.custom_commodity ? data.custom_commodity : data.commodity;
 
             const productionData: Record<string, any> = {
                 land_id: data.land_id,

@@ -68,12 +68,12 @@ export function formatCurrencyCompact(amount: number): string {
  * Based on typical farming costs in Indonesia
  */
 export const DEFAULT_COST_ESTIMATES: Record<string, number> = {
-    "Red Chili": 500000,
-    "Rawit Chili": 400000,
-    Tomatoes: 350000,
-    Shallots: 600000,
-    Garlic: 550000,
-    Others: 400000,
+    "Cabai Merah": 500000,
+    "Cabai Rawit": 400000,
+    Tomat: 350000,
+    "Bawang Merah": 600000,
+    "Bawang Putih": 550000,
+    Lainnya: 400000,
 };
 
 /**
@@ -81,12 +81,12 @@ export const DEFAULT_COST_ESTIMATES: Record<string, number> = {
  * Based on typical market prices in Indonesia
  */
 export const DEFAULT_PRICE_ESTIMATES: Record<string, number> = {
-    "Red Chili": 35000,
-    "Rawit Chili": 50000,
-    Tomatoes: 15000,
-    Shallots: 25000,
-    Garlic: 40000,
-    Others: 20000,
+    "Cabai Merah": 35000,
+    "Cabai Rawit": 50000,
+    Tomat: 15000,
+    "Bawang Merah": 25000,
+    "Bawang Putih": 40000,
+    Lainnya: 20000,
 };
 
 /**
@@ -104,7 +104,7 @@ export function getSmartCostDefault(commodity: string, historicalProductions: Pr
     }
 
     // Fall back to default estimates
-    const estimate = DEFAULT_COST_ESTIMATES[commodity] || DEFAULT_COST_ESTIMATES["Others"];
+    const estimate = DEFAULT_COST_ESTIMATES[commodity] || DEFAULT_COST_ESTIMATES["Lainnya"];
     return { value: estimate, source: "estimate" };
 }
 
@@ -123,7 +123,7 @@ export function getSmartPriceDefault(commodity: string, historicalProductions: P
     }
 
     // Fall back to default estimates
-    const estimate = DEFAULT_PRICE_ESTIMATES[commodity] || DEFAULT_PRICE_ESTIMATES["Others"];
+    const estimate = DEFAULT_PRICE_ESTIMATES[commodity] || DEFAULT_PRICE_ESTIMATES["Lainnya"];
     return { value: estimate, source: "estimate" };
 }
 

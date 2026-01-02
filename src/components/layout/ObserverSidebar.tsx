@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Download, LogOut, User, ChevronDown, Eye } from "lucide-react";
+import { LayoutDashboard, Users, Download, LogOut, User, ChevronDown, Eye, Briefcase } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/auth-context";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from "@/components/ui/sidebar";
@@ -16,6 +16,7 @@ interface MenuItem {
 const observerMenuItems: MenuItem[] = [
     { title: "Dashboard", url: "/observer", icon: LayoutDashboard },
     { title: "Data Petani", url: "/observer/farmers", icon: Users },
+    { title: "Data Manager", url: "/observer/managers", icon: Briefcase },
     { title: "Ekspor Data", url: "/observer/export", icon: Download },
 ];
 
