@@ -1,0 +1,40 @@
+{
+    "name": "RINDANG - Digital Farming Platform",
+    "short_name": "RINDANG",
+    "description": "Platform pertanian digital untuk mengelola lahan dan produksi pertanian secara efisien",
+    "start_url": "/",
+    "scope": "/",
+    "id": "/",
+    "display": "standalone",
+    "orientation": "any",
+    "theme_color": "#16a34a",
+    "background_color": "#ffffff",
+    "icons": [
+        {
+            "src": "/web-app-manifest-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/web-app-manifest-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/web-app-manifest-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/web-app-manifest-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "categories": ["productivity", "business"],
+    "lang": "id"
+}

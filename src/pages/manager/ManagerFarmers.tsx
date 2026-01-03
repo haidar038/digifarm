@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ManagerLayout } from "@/components/layout/ManagerLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,13 +35,7 @@ export default function ManagerFarmers() {
     const [requestNote, setRequestNote] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
-    useEffect(() => {
-        if (user) {
-            loadFarmers();
-        }
-    }, [user]);
-
-    const loadFarmers = async () => {
+    const loadFarmers = useCallback(async () => {
         try {
             setLoading(true);
 
@@ -133,7 +127,13 @@ export default function ManagerFarmers() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
+
+    useEffect(() => {
+        if (user) {
+            loadFarmers();
+        }
+    }, [user, loadFarmers]);
 
     const handleRequestConnection = async () => {
         if (!selectedFarmer) return;
