@@ -7,21 +7,37 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Leaf } from "lucide-react";
 
+// Helper function to get redirect path based on role
+function getRoleBasedRedirect(role: string | undefined): string {
+    switch (role) {
+        case "admin":
+            return "/admin";
+        case "observer":
+            return "/observer";
+        case "manager":
+            return "/manager";
+        default:
+            return "/dashboard";
+    }
+}
+
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const { signIn, user, loading } = useAuth();
+    const { signIn, user, profile, loading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Redirect authenticated users to their role-based dashboard
     useEffect(() => {
-        if (!loading && user) {
-            navigate("/");
+        if (!loading && user && profile) {
+            const redirectPath = getRoleBasedRedirect(profile.role);
+            navigate(redirectPath, { replace: true });
         }
-    }, [user, loading, navigate]);
+    }, [user, profile, loading, navigate]);
 
-    const from = location.state?.from?.pathname || "/";
+    const from = location.state?.from?.pathname;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,7 +45,8 @@ export default function Login() {
 
         try {
             await signIn(email, password);
-            navigate(from, { replace: true });
+            // Redirect to saved path or role-based dashboard
+            navigate(from || "/dashboard", { replace: true });
         } catch {
             // Error handled in AuthContext
         } finally {

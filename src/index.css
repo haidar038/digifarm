@@ -99,6 +99,12 @@
     --gradient-subtle: linear-gradient(180deg, hsl(150 15% 10%) 0%, hsl(150 15% 8%) 100%);
     --gradient-card: linear-gradient(135deg, hsl(150 15% 12%) 0%, hsl(150 15% 10%) 100%);
   }
+  .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+  }
+  .maplibregl-popup-tip {
+    @apply hidden!;
+  }
 }
 
 @layer base {

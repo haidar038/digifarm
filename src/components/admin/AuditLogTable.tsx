@@ -186,7 +186,7 @@ export function AuditLogTable({ logs, users, isLoading, onViewDetail }: AuditLog
                         handleFilterChange();
                     }}
                 >
-                    <SelectTrigger className="w-[200px]">
+                    <SelectTrigger className="bg-white w-[200px]">
                         <SelectValue placeholder="Semua User" />
                     </SelectTrigger>
                     <SelectContent>
@@ -207,7 +207,7 @@ export function AuditLogTable({ logs, users, isLoading, onViewDetail }: AuditLog
                         handleFilterChange();
                     }}
                 >
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="bg-white w-[140px]">
                         <SelectValue placeholder="Semua Aksi" />
                     </SelectTrigger>
                     <SelectContent>
@@ -226,7 +226,7 @@ export function AuditLogTable({ logs, users, isLoading, onViewDetail }: AuditLog
                         handleFilterChange();
                     }}
                 >
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="bg-white w-[140px]">
                         <SelectValue placeholder="Semua Tabel" />
                     </SelectTrigger>
                     <SelectContent>
@@ -305,7 +305,7 @@ export function AuditLogTable({ logs, users, isLoading, onViewDetail }: AuditLog
             </p>
 
             {/* Table */}
-            <div className="rounded-md border">
+            <div className="rounded-md border bg-white">
                 <Table>
                     <TableHeader>
                         <TableRow>

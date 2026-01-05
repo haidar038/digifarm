@@ -14,6 +14,13 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ForcePasswordChange from "./pages/ForcePasswordChange";
 
+// Public pages
+import LandingPage from "./pages/LandingPage";
+import AIAssistant from "./pages/ai/AIAssistant";
+import ArticleList from "./pages/articles/ArticleList";
+import ArticleDetail from "./pages/articles/ArticleDetail";
+import PublicWeather from "./pages/PublicWeather";
+
 // Protected pages (Farmer/Manager)
 import Index from "./pages/Index";
 import Lands from "./pages/Lands";
@@ -30,6 +37,8 @@ import AdminLands from "./pages/admin/AdminLands";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminConnections from "./pages/admin/AdminConnections";
 import AdminAuditLog from "./pages/admin/AdminAuditLog";
+import AdminArticles from "./pages/admin/AdminArticles";
+import AdminArticleEditor from "./pages/admin/AdminArticleEditor";
 
 // Observer pages
 import ObserverDashboard from "./pages/observer/ObserverDashboard";
@@ -94,13 +103,18 @@ const App = () => (
                     <BrowserRouter>
                         <Routes>
                             {/* Public routes */}
+                            <Route path="/" element={<LandingPage />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/forgot-password" element={<ForgotPassword />} />
                             <Route path="/change-password" element={<ForcePasswordChange />} />
+                            <Route path="/ai" element={<AIAssistant />} />
+                            <Route path="/articles" element={<ArticleList />} />
+                            <Route path="/articles/:slug" element={<ArticleDetail />} />
+                            <Route path="/cuaca" element={<PublicWeather />} />
 
-                            {/* Role-based home redirect */}
+                            {/* Role-based dashboard redirect */}
                             <Route
-                                path="/"
+                                path="/dashboard"
                                 element={
                                     <ProtectedRoute>
                                         <RoleBasedHome />
@@ -117,6 +131,7 @@ const App = () => (
                                     </ProtectedRoute>
                                 }
                             />
+
                             <Route
                                 path="/production"
                                 element={
@@ -196,6 +211,30 @@ const App = () => (
                                 element={
                                     <ProtectedRoute requiredRole="admin">
                                         <AdminAuditLog />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/admin/articles"
+                                element={
+                                    <ProtectedRoute requiredRole="admin">
+                                        <AdminArticles />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/admin/articles/new"
+                                element={
+                                    <ProtectedRoute requiredRole="admin">
+                                        <AdminArticleEditor />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/admin/articles/:id/edit"
+                                element={
+                                    <ProtectedRoute requiredRole="admin">
+                                        <AdminArticleEditor />
                                     </ProtectedRoute>
                                 }
                             />
