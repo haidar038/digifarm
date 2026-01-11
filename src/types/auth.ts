@@ -1,7 +1,7 @@
 import type { User, Session } from "@supabase/supabase-js";
 
 // Role definitions for RBAC
-export type Role = "farmer" | "manager" | "observer" | "admin";
+export type Role = "farmer" | "manager" | "observer" | "admin" | "expert";
 
 // Permission types for granular access control
 export type Permission = "read:own" | "write:own" | "read:all" | "write:all" | "export:all" | "manage:users" | "manage:system";
@@ -12,6 +12,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     manager: ["read:own", "write:own", "read:all"],
     observer: ["read:all", "export:all"],
     admin: ["read:own", "write:own", "read:all", "write:all", "export:all", "manage:users", "manage:system"],
+    expert: ["read:own", "write:own", "read:all"], // Expert can read all forum content and write own answers
 };
 
 // Helper to check if a role has a specific permission

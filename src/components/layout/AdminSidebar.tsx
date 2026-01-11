@@ -1,4 +1,4 @@
-import { LayoutDashboard, Map, Users, LogOut, User, ChevronDown, Shield, Link2, FileText, Newspaper } from "lucide-react";
+import { LayoutDashboard, Map, Users, LogOut, User, ChevronDown, Shield, Link2, FileText, Newspaper, MessageSquare } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/auth-context";
 import { useRole } from "@/hooks/useRole";
@@ -20,6 +20,7 @@ const adminMenuItems: MenuItem[] = [
     { title: "Manajemen Pengguna", url: "/admin/users", icon: Users },
     { title: "Manajemen Koneksi", url: "/admin/connections", icon: Link2 },
     { title: "Manajemen Artikel", url: "/admin/articles", icon: Newspaper },
+    { title: "Manajemen Forum", url: "/admin/forum", icon: MessageSquare },
     { title: "Audit Log", url: "/admin/audit-log", icon: FileText },
 ];
 

@@ -23,7 +23,7 @@ interface ProtectedRouteProps {
     redirectTo?: string;
 }
 
-export function ProtectedRoute({ children, requiredRole, requiredPermission, redirectTo = "/" }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, requiredRole, requiredPermission, redirectTo = "/dashboard" }: ProtectedRouteProps) {
     const { user, loading, profile } = useAuth();
     const { role, hasPermission } = useRole();
     const location = useLocation();
@@ -105,4 +105,11 @@ export function ManagerRoute({ children }: { children: React.ReactNode }) {
  */
 export function ObserverRoute({ children }: { children: React.ReactNode }) {
     return <ProtectedRoute requiredRole="observer">{children}</ProtectedRoute>;
+}
+
+/**
+ * Route that requires expert role (forum expert access)
+ */
+export function ExpertRoute({ children }: { children: React.ReactNode }) {
+    return <ProtectedRoute requiredRole="expert">{children}</ProtectedRoute>;
 }

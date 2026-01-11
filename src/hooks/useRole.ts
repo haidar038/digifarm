@@ -16,6 +16,7 @@ export function useRole() {
     const isManager = role === "manager";
     const isObserver = role === "observer";
     const isFarmer = role === "farmer";
+    const isExpert = role === "expert";
     const isManagerOrAdmin = isManager || isAdmin;
 
     // Permission checks
@@ -68,6 +69,7 @@ export function useRole() {
         isManager,
         isObserver,
         isFarmer,
+        isExpert,
         isManagerOrAdmin,
 
         // Permission checks

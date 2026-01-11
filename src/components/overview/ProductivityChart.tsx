@@ -11,16 +11,24 @@ interface ProductivityChartProps {
     productions: Production[];
 }
 
-// Colors for different commodities
+// Colors for different commodities (vibrant, distinct colors)
 const COMMODITY_COLORS: Record<string, string> = {
-    "Red Chili": "hsl(0, 72%, 51%)",
-    "Rawit Chili": "hsl(20, 72%, 51%)",
-    Tomatoes: "hsl(40, 72%, 51%)",
-    Shallots: "hsl(280, 72%, 51%)",
-    Garlic: "hsl(200, 72%, 51%)",
+    // Indonesian names (current)
+    "Cabai Merah": "#E53935", // Vibrant Red
+    "Cabai Rawit": "#FF6F00", // Deep Orange
+    Tomat: "#F4511E", // Coral Orange-Red
+    "Bawang Merah": "#8E24AA", // Purple
+    "Bawang Putih": "#1E88E5", // Blue
+    Lainnya: "#43A047", // Green
+    // English names (legacy support)
+    "Red Chili": "#E53935",
+    "Rawit Chili": "#FF6F00",
+    Tomatoes: "#F4511E",
+    Shallots: "#8E24AA",
+    Garlic: "#1E88E5",
 };
 
-const DEFAULT_COLOR = "hsl(var(--primary))";
+const DEFAULT_COLOR = "#78909C"; // Blue Grey for unknown commodities
 
 export function ProductivityChart({ productions }: ProductivityChartProps) {
     // Get harvested productions only
