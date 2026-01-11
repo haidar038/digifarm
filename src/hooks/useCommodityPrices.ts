@@ -18,48 +18,73 @@ export const commodityKeys = {
 
 /**
  * Fetch price for a single commodity on a specific date
- * Note: Due to CORS restrictions, we'll use a proxy or fallback to mock data
+ * Uses proxy chain: Supabase Edge Function -> Vercel API -> Mock data
  */
 async function fetchCommodityPrice(commodityId: string, date: Date): Promise<DailyPrice | null> {
+    // If configured to use mock data only, skip API calls
+    if (COMMODITY_API_CONFIG.USE_MOCK_DATA_ONLY) {
+        return null;
+    }
+
     const dateStr = formatDateForAPI(date);
 
-    const params = new URLSearchParams({
-        tanggal: dateStr,
-        commodity: commodityId,
-        priceType: COMMODITY_API_CONFIG.PRICE_TYPE_ID.toString(),
-        isPasokan: COMMODITY_API_CONFIG.IS_PASOKAN.toString(),
-        jenis: COMMODITY_API_CONFIG.JENIS_ID.toString(),
-        periode: COMMODITY_API_CONFIG.PERIOD_ID.toString(),
-        provId: COMMODITY_API_CONFIG.PROVINCE_ID.toString(),
-        _: Date.now().toString(),
-    });
+    // Try Supabase Edge Function first (primary)
+    if (COMMODITY_API_CONFIG.SUPABASE_PROXY_URL) {
+        try {
+            const params = new URLSearchParams({
+                commodityId,
+                date: dateStr,
+                provinceId: COMMODITY_API_CONFIG.PROVINCE_ID.toString(),
+                priceType: COMMODITY_API_CONFIG.PRICE_TYPE_ID.toString(),
+            });
 
+            const response = await fetch(`${COMMODITY_API_CONFIG.SUPABASE_PROXY_URL}?${params.toString()}`, {
+                method: "GET",
+                headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                },
+            });
+
+            if (response.ok) {
+                const data: BIAPIResponse = await response.json();
+                if (data.data && data.data.length > 0) {
+                    return parseBIResponseToPrice(data.data[0]);
+                }
+            }
+        } catch (error) {
+            console.warn("Supabase proxy failed, trying Vercel fallback:", error);
+        }
+    }
+
+    // Fallback to Vercel API route
     try {
-        // Try fetching through a CORS proxy or directly
-        // In production, this would go through a Supabase Edge Function
-        const response = await fetch(`${COMMODITY_API_CONFIG.API_URL}?${params.toString()}`, {
+        const params = new URLSearchParams({
+            commodityId,
+            date: dateStr,
+            provinceId: COMMODITY_API_CONFIG.PROVINCE_ID.toString(),
+            priceType: COMMODITY_API_CONFIG.PRICE_TYPE_ID.toString(),
+        });
+
+        const response = await fetch(`${COMMODITY_API_CONFIG.VERCEL_PROXY_URL}?${params.toString()}`, {
             method: "GET",
             headers: {
                 Accept: "application/json",
             },
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.ok) {
+            const data: BIAPIResponse = await response.json();
+            if (data.data && data.data.length > 0) {
+                return parseBIResponseToPrice(data.data[0]);
+            }
         }
-
-        const data: BIAPIResponse = await response.json();
-
-        if (!data.data || data.data.length === 0) {
-            return null;
-        }
-
-        return parseBIResponseToPrice(data.data[0]);
     } catch (error) {
-        // CORS error or network error - will use mock data
-        console.warn(`Failed to fetch price for ${commodityId}:`, error);
-        return null;
+        console.warn(`Vercel proxy also failed for ${commodityId}:`, error);
     }
+
+    // All proxies failed - will use mock data
+    return null;
 }
 
 /**

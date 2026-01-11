@@ -88,8 +88,15 @@ export interface CommodityFilter {
  * API Configuration
  */
 export const COMMODITY_API_CONFIG = {
-    // Bank Indonesia API endpoint
+    // Bank Indonesia API endpoint (direct - blocked by CORS in browser)
     API_URL: "https://www.bi.go.id/hargapangan/WebSite/Home/GetGridData1",
+
+    // Proxy URLs (to bypass CORS)
+    // Supabase Edge Function (primary)
+    SUPABASE_PROXY_URL: import.meta.env.VITE_SUPABASE_URL ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/commodity-proxy` : null,
+
+    // Vercel API route (fallback)
+    VERCEL_PROXY_URL: "/api/commodity",
 
     // Location parameters
     PROVINCE_ID: 32, // Maluku Utara
@@ -108,6 +115,9 @@ export const COMMODITY_API_CONFIG = {
     // Chart configuration
     CHART_MIN_PRICE: 0,
     CHART_MAX_PRICE: 200000, // Rp 200.000
+
+    // Feature flags
+    USE_MOCK_DATA_ONLY: false, // Set to true to always use mock data
 } as const;
 
 /**
