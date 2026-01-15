@@ -36,6 +36,12 @@ export interface UserProfile {
     must_change_password?: boolean;
     created_at: string;
     updated_at: string;
+    // Optional farmer profile when joined
+    farmer_profile?: {
+        id: string;
+        farmer_code: string;
+        status: "active" | "inactive" | "pending" | "suspended";
+    } | null;
 }
 
 // Data required for user registration

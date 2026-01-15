@@ -7,14 +7,17 @@ import { UserProfile, Role } from "@/types/auth";
 import { useAuth } from "@/contexts/auth-context";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { MapPin, Phone, Calendar, MoreHorizontal, Pencil, Trash2, KeyRound } from "lucide-react";
+import { MapPin, Phone, Calendar, MoreHorizontal, Pencil, Trash2, KeyRound, IdCard } from "lucide-react";
+import type { FarmerStatus } from "@/types/database";
 
 interface UserTableProps {
     users: UserProfile[];
     onRoleChange: (userId: string, newRole: Role) => void;
+    onFarmerStatusChange: (farmerId: string, newStatus: "active" | "inactive" | "pending" | "suspended") => void;
     onEdit: (user: UserProfile) => void;
     onDelete: (user: UserProfile) => void;
     onResetPassword: (user: UserProfile) => void;
+    showFarmerColumns?: boolean;
 }
 
 // Helper to get role badge variant
@@ -41,13 +44,47 @@ function getRoleLabel(role: Role): string {
             return "Manager";
         case "observer":
             return "Observer";
+        case "expert":
+            return "Expert";
         case "farmer":
         default:
             return "Petani";
     }
 }
 
-export function UserTable({ users, onRoleChange, onEdit, onDelete, onResetPassword }: UserTableProps) {
+// Helper to get farmer status badge variant
+function getFarmerStatusBadgeVariant(status: FarmerStatus): "default" | "secondary" | "destructive" | "outline" {
+    switch (status) {
+        case "active":
+            return "default";
+        case "inactive":
+            return "secondary";
+        case "pending":
+            return "outline";
+        case "suspended":
+            return "destructive";
+        default:
+            return "secondary";
+    }
+}
+
+// Helper to get farmer status label in Indonesian
+function getFarmerStatusLabel(status: FarmerStatus): string {
+    switch (status) {
+        case "active":
+            return "Aktif";
+        case "inactive":
+            return "Nonaktif";
+        case "pending":
+            return "Pending";
+        case "suspended":
+            return "Ditangguhkan";
+        default:
+            return status;
+    }
+}
+
+export function UserTable({ users, onRoleChange, onFarmerStatusChange, onEdit, onDelete, onResetPassword, showFarmerColumns = true }: UserTableProps) {
     const { user: currentUser } = useAuth();
 
     if (users.length === 0) {
@@ -60,9 +97,11 @@ export function UserTable({ users, onRoleChange, onEdit, onDelete, onResetPasswo
                 <TableHeader>
                     <TableRow>
                         <TableHead>Nama</TableHead>
+                        {showFarmerColumns && <TableHead>Kode Petani</TableHead>}
                         <TableHead>Kontak</TableHead>
                         <TableHead>Lokasi</TableHead>
                         <TableHead>Role</TableHead>
+                        {showFarmerColumns && <TableHead>Status Petani</TableHead>}
                         <TableHead>Bergabung</TableHead>
                         <TableHead className="w-[80px]">Aksi</TableHead>
                     </TableRow>
@@ -87,6 +126,18 @@ export function UserTable({ users, onRoleChange, onEdit, onDelete, onResetPasswo
                                         </Badge>
                                     )}
                                 </TableCell>
+                                {showFarmerColumns && (
+                                    <TableCell>
+                                        {user.role === "farmer" && user.farmer_profile ? (
+                                            <div className="flex items-center gap-1 text-sm font-mono">
+                                                <IdCard className="h-3 w-3 text-muted-foreground" />
+                                                {user.farmer_profile.farmer_code}
+                                            </div>
+                                        ) : (
+                                            <span className="text-muted-foreground text-sm">-</span>
+                                        )}
+                                    </TableCell>
+                                )}
                                 <TableCell>
                                     {user.phone ? (
                                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -120,11 +171,31 @@ export function UserTable({ users, onRoleChange, onEdit, onDelete, onResetPasswo
                                                 <SelectItem value="farmer">Petani</SelectItem>
                                                 <SelectItem value="manager">Manager</SelectItem>
                                                 <SelectItem value="observer">Observer</SelectItem>
+                                                <SelectItem value="expert">Expert</SelectItem>
                                                 <SelectItem value="admin">Admin</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     )}
                                 </TableCell>
+                                {showFarmerColumns && (
+                                    <TableCell>
+                                        {user.role === "farmer" && user.farmer_profile ? (
+                                            <Select value={user.farmer_profile.status} onValueChange={(value) => onFarmerStatusChange(user.farmer_profile!.id, value as FarmerStatus)}>
+                                                <SelectTrigger className="w-[130px] h-8">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="active">Aktif</SelectItem>
+                                                    <SelectItem value="inactive">Nonaktif</SelectItem>
+                                                    <SelectItem value="pending">Pending</SelectItem>
+                                                    <SelectItem value="suspended">Ditangguhkan</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <span className="text-muted-foreground text-sm">-</span>
+                                        )}
+                                    </TableCell>
+                                )}
                                 <TableCell>
                                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                         <Calendar className="h-3 w-3" />

@@ -4,6 +4,20 @@
 export type ConnectionStatus = "pending" | "active" | "rejected" | "revoked";
 export type ConnectionType = "admin_assigned" | "manager_requested";
 
+// =====================================================
+// Farmer Profile Types
+// =====================================================
+export type FarmerStatus = "active" | "inactive" | "pending" | "suspended";
+
+export interface FarmerProfile {
+    id: string;
+    user_id: string;
+    farmer_code: string;
+    status: FarmerStatus;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface ManagerFarmerConnection {
     id: string;
     manager_id: string;
