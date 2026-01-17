@@ -147,8 +147,8 @@ const LandingPage = () => {
                             </div>
                         </div>
 
-                        {/* Right Image */}
-                        <div className="relative lg:pl-8 order-first lg:order-last">
+                        {/* Right Image - Desktop only */}
+                        <div className="hidden lg:block relative lg:pl-8">
                             <img src="/hero-img.png" alt="Petani menggunakan teknologi DigiFarm" className="w-full h-auto object-cover rounded-2xl" />
                         </div>
                     </div>
@@ -469,7 +469,6 @@ const LandingPage = () => {
 
                 <div className="container mx-auto px-4 relative">
                     <div className="max-w-3xl mx-auto text-center text-primary-foreground">
-                        <img src="/logo/rindang-secondary.svg" alt="RINDANG" className="h-10 mx-auto mb-6 opacity-90" />
                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">Siap Memulai Pertanian Digital?</h2>
                         <p className="text-lg md:text-xl opacity-90 mb-10 max-w-2xl mx-auto">Bergabunglah dengan ratusan petani lainnya yang telah merasakan manfaat DigiFarm RINDANG.</p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">

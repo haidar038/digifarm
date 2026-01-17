@@ -1,5 +1,3 @@
-import { Leaf } from "lucide-react";
-
 export const Footer = () => {
     return (
         <footer className="py-12 border-t">
@@ -7,9 +5,8 @@ export const Footer = () => {
                 <div className="grid md:grid-cols-4 gap-8 mb-8">
                     {/* Brand */}
                     <div className="md:col-span-2">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Leaf className="h-6 w-6 text-primary" />
-                            <span className="text-lg font-bold">DigiFarm RINDANG</span>
+                        <div className="flex items-center mb-4">
+                            <img src="/logo/rindang-primary.svg" alt="RINDANG" className="h-8 w-auto" />
                         </div>
                         <p className="text-muted-foreground mb-4 max-w-md">Platform manajemen pertanian digital untuk petani modern Indonesia. Kelola lahan, pantau produksi, dan tingkatkan hasil panen.</p>
                     </div>
