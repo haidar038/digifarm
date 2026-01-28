@@ -20,7 +20,7 @@ export function CommodityPriceCard() {
     // Loading state
     if (isLoading) {
         return (
-            <Link to="/commodity-prices">
+            <Link to="/harga-komoditas">
                 <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg animate-slide-up cursor-pointer h-full">
                     <CardContent className="p-6 h-full flex flex-col justify-between">
                         <div className="flex items-start justify-between">
@@ -46,7 +46,7 @@ export function CommodityPriceCard() {
     // Error state or no data
     if (isError || !cabaiMerahBesar) {
         return (
-            <Link to="/commodity-prices">
+            <Link to="/harga-komoditas">
                 <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg animate-slide-up cursor-pointer h-full">
                     <CardContent className="p-6 h-full flex flex-col justify-between">
                         <div className="flex items-start justify-between">
@@ -72,7 +72,7 @@ export function CommodityPriceCard() {
     const trendColor = cabaiMerahBesar.trend === "up" ? "text-red-500" : cabaiMerahBesar.trend === "down" ? "text-green-500" : "text-muted-foreground";
 
     return (
-        <Link to="/commodity-prices">
+        <Link to="/harga-komoditas">
             <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg animate-slide-up cursor-pointer h-full">
                 <CardContent className="p-6 h-full flex flex-col justify-between">
                     <div className="flex items-start justify-between">

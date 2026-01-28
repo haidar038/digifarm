@@ -91,13 +91,13 @@ function ActivityStatsCards() {
             <StatCard title="Luas Lahan" value={isLoading ? "..." : `${stats?.totalLandArea.toLocaleString() ?? 0} m²`} subtitle="Jumlah Kebun" subtitleValue={isLoading ? "..." : `${stats?.landCount ?? 0} lahan`} icon={Warehouse} />
 
             {/* Farmer Count */}
-            <StatCard title="Jumlah Petani" value={isLoading ? "..." : stats?.farmerCount ?? 0} subtitle="Petani Terdaftar" subtitleValue="Aktif" icon={Users} />
+            <StatCard title="Jumlah Petani" value={isLoading ? "..." : (stats?.farmerCount ?? 0)} subtitle="Petani Terdaftar" subtitleValue="Aktif" icon={Users} />
         </div>
     );
 }
 
 const LandingPage = () => {
-    const regencyStats = useRegencyStats();
+    const { data: regencyStats = [], isLoading: isRegencyLoading } = useRegencyStats();
     const { data: articles = [], isLoading: isArticlesLoading } = usePublicArticles({ limit: 3 });
 
     return (
@@ -250,22 +250,53 @@ const LandingPage = () => {
                         </CardContent>
                     </Card>
                     {/* Regency Legend */}
-                    {regencyStats.length > 0 && (
-                        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {regencyStats.slice(0, 4).map((regency, index) => (
-                                <Card key={index} className="hover:shadow-lg transition-shadow border-primary/10">
+                    <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {isRegencyLoading ? (
+                            // Loading Skeleton
+                            [...Array(4)].map((_, index) => (
+                                <Card key={index} className="border-primary/10 bg-card/50 animate-pulse">
                                     <CardContent className="p-4">
                                         <div className="flex items-center gap-2 mb-2">
-                                            <MapPin className="h-4 w-4 text-primary" />
-                                            <span className="font-medium truncate">Kota {regency.name}</span>
+                                            <div className="h-4 w-4 rounded-full bg-muted" />
+                                            <div className="h-4 w-24 bg-muted rounded" />
                                         </div>
-                                        <p className="text-2xl font-bold text-primary">{regency.landCount}</p>
-                                        <p className="text-sm text-muted-foreground">Lahan Terdaftar</p>
+                                        <div className="h-8 w-16 bg-muted rounded mb-2" />
+                                        <div className="h-3 w-20 bg-muted rounded" />
                                     </CardContent>
                                 </Card>
-                            ))}
-                        </div>
-                    )}
+                            ))
+                        ) : (
+                            <>
+                                {regencyStats.slice(0, 4).map((regency, index) => (
+                                    <Card key={`data-${index}`} className="hover:shadow-lg transition-shadow border-primary/10">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <MapPin className="h-4 w-4 text-primary" />
+                                                <span className="font-medium truncate">Kota {regency.name}</span>
+                                            </div>
+                                            <p className="text-2xl font-bold text-primary">{regency.landCount}</p>
+                                            <p className="text-sm text-muted-foreground">Lahan Terdaftar</p>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                                {/* Fill remaining slots up to 4 */}
+                                {[...Array(Math.max(0, 4 - regencyStats.slice(0, 4).length))].map((_, index) => (
+                                    <Card key={`fallback-${index}`} className="hover:shadow-lg transition-shadow border-primary/10 opacity-80 decoration-slice">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                                <span className="font-medium truncate text-muted-foreground">Wilayah {regencyStats.slice(0, 4).length + index + 1}</span>
+                                            </div>
+                                            <Badge variant="secondary" className="mb-2 bg-primary/10 text-primary hover:bg-primary/20">
+                                                Segera Hadir
+                                            </Badge>
+                                            <p className="text-sm text-muted-foreground">Data wilayah sedang disiapkan</p>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </>
+                        )}
+                    </div>
                 </div>
             </section>
 
@@ -334,31 +365,47 @@ const LandingPage = () => {
                                     </CardHeader>
                                 </Card>
                             ))
-                        ) : articles.length > 0 ? (
-                            articles.map((article) => (
-                                <Link to={`/articles/${article.slug}`} key={article.id}>
-                                    <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-primary/10 hover:border-primary/30 overflow-hidden h-full">
-                                        <div className="h-2 bg-gradient-to-r from-primary to-green-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        ) : (
+                            <>
+                                {articles.map((article) => (
+                                    <Link to={`/articles/${article.slug}`} key={article.id}>
+                                        <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-primary/10 hover:border-primary/30 overflow-hidden h-full">
+                                            <div className="h-2 bg-gradient-to-r from-primary to-green-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <CardHeader>
+                                                <div className="flex justify-between items-center gap-2 mb-2">
+                                                    <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
+                                                        {article.category?.name || "Umum"}
+                                                    </Badge>
+                                                    <span className="text-sm text-muted-foreground">
+                                                        {new Date(article.published_at || article.created_at).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    <CardTitle className="group-hover:text-primary transition-colors line-clamp-2">{article.title}</CardTitle>
+                                                    <CardDescription className="line-clamp-2 text-sm">{article.excerpt}</CardDescription>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </Link>
+                                ))}
+                                {/* Fill remaining slots up to 3 */}
+                                {[...Array(Math.max(0, 3 - articles.length))].map((_, index) => (
+                                    <Card key={`fallback-${index}`} className="group hover:shadow-xl transition-all duration-300 border-primary/10 overflow-hidden h-full grayscale hover:grayscale-0">
                                         <CardHeader>
                                             <div className="flex justify-between items-center gap-2 mb-2">
-                                                <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
-                                                    {article.category?.name || "Umum"}
+                                                <Badge variant="secondary" className="bg-primary/10 text-primary">
+                                                    Artikel
                                                 </Badge>
-                                                <span className="text-sm text-muted-foreground">{new Date(article.published_at || article.created_at).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                                                <span className="text-sm text-muted-foreground">Segera Hadir</span>
                                             </div>
                                             <div className="space-y-4">
-                                                <CardTitle className="group-hover:text-primary transition-colors line-clamp-2">{article.title}</CardTitle>
-                                                <CardDescription className="line-clamp-2 text-sm">{article.excerpt}</CardDescription>
+                                                <CardTitle className="text-muted-foreground">Tips Pertanian #{articles.length + index + 1}</CardTitle>
+                                                <CardDescription>Konten edukasi dan tips pertanian menarik sedang kami siapkan untuk membantu meningkatkan hasil panen Anda.</CardDescription>
                                             </div>
                                         </CardHeader>
                                     </Card>
-                                </Link>
-                            ))
-                        ) : (
-                            <div className="col-span-3 text-center py-8 text-muted-foreground">
-                                <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                <p>Belum ada artikel yang dipublikasikan</p>
-                            </div>
+                                ))}
+                            </>
                         )}
                     </div>
                 </div>

@@ -95,19 +95,24 @@ export interface RegencyStats {
 /**
  * Hook to get farmer count and land count grouped by regency
  */
-export function useRegencyStats(): RegencyStats[] {
-    const { data: farmers = [] } = useFarmerMapData();
+export function useRegencyStats() {
+    const { data: farmers = [], isLoading } = useFarmerMapData();
 
     // Group farmers by regency and aggregate land counts
-    const regencyStats = farmers.reduce((acc, farmer) => {
-        const regency = farmer.regency_name ?? "Tidak Diketahui";
-        if (!acc[regency]) {
-            acc[regency] = { name: regency, farmerCount: 0, landCount: 0 };
-        }
-        acc[regency].farmerCount++;
-        acc[regency].landCount += farmer.land_count;
-        return acc;
-    }, {} as Record<string, RegencyStats>);
+    const regencyStats = farmers.reduce(
+        (acc, farmer) => {
+            const regency = farmer.regency_name ?? "Tidak Diketahui";
+            if (!acc[regency]) {
+                acc[regency] = { name: regency, farmerCount: 0, landCount: 0 };
+            }
+            acc[regency].farmerCount++;
+            acc[regency].landCount += farmer.land_count;
+            return acc;
+        },
+        {} as Record<string, RegencyStats>,
+    );
 
-    return Object.values(regencyStats).sort((a, b) => b.farmerCount - a.farmerCount);
+    const data = Object.values(regencyStats).sort((a, b) => b.farmerCount - a.farmerCount);
+
+    return { data, isLoading };
 }

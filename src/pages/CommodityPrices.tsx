@@ -63,7 +63,7 @@ export default function CommodityPrices() {
                                         <MapPin className="w-3 h-3" />
                                         {COMMODITY_API_CONFIG.LOCATION_NAME}
                                     </Badge>
-                                    <Badge variant="outline" className="gap-1">
+                                    <Badge variant="outline" className="gap-1 bg-white">
                                         <Calendar className="w-3 h-3" />
                                         Update: {lastUpdate}
                                     </Badge>
@@ -91,7 +91,7 @@ export default function CommodityPrices() {
                         )}
 
                         {/* Info Alert */}
-                        <Alert>
+                        <Alert className="bg-white">
                             <Info className="h-4 w-4" />
                             <AlertDescription>
                                 Data harga bersumber dari <strong>Bank Indonesia - PIHPS</strong> (Pusat Informasi Harga Pangan Antar Daerah). Harga dapat berubah setiap hari dan merupakan harga eceran di wilayah{" "}
@@ -115,9 +115,9 @@ export default function CommodityPrices() {
                         </div>
 
                         {/* Additional Info */}
-                        <Card className="bg-muted/30">
+                        <Card className="bg-white">
                             <CardContent className="p-6">
-                                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                                <h3 className="font-semibold mb-3 flex items-center gap-2 text-amber-400">
                                     <Info className="w-4 h-4" />
                                     Tentang Data Harga
                                 </h3>
