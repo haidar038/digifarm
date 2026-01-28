@@ -26,6 +26,7 @@ function PageLoader() {
 // Auth pages (keep static - critical path)
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import ForcePasswordChange from "./pages/ForcePasswordChange";
 
 // Public pages (keep static - SEO important)
@@ -142,6 +143,7 @@ const App = () => (
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/forgot-password" element={<ForgotPassword />} />
                                 <Route path="/change-password" element={<ForcePasswordChange />} />
+                                <Route path="/reset-password" element={<ResetPassword />} />
                                 <Route path="/ai" element={<AIAssistant />} />
                                 <Route path="/articles" element={<ArticleList />} />
                                 <Route path="/articles/:slug" element={<ArticleDetail />} />

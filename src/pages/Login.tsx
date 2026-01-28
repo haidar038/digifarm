@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Leaf } from "lucide-react";
+import { Loader2, Leaf, Eye, EyeOff } from "lucide-react";
 
 // Helper function to get redirect path based on role
 function getRoleBasedRedirect(role: string | undefined): string {
@@ -24,6 +24,7 @@ function getRoleBasedRedirect(role: string | undefined): string {
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const { signIn, user, profile, loading } = useAuth();
     const navigate = useNavigate();
@@ -44,7 +45,7 @@ export default function Login() {
         setIsLoading(true);
 
         try {
-            await signIn(email, password);
+            await signIn(email.trim(), password);
             // Redirect to saved path or role-based dashboard
             navigate(from || "/dashboard", { replace: true });
         } catch {
@@ -79,7 +80,12 @@ export default function Login() {
                                     Lupa password?
                                 </Link>
                             </div>
-                            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
+                            <div className="relative">
+                                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
+                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-4">
