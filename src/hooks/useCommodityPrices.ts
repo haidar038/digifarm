@@ -90,6 +90,9 @@ async function fetchCommodityPrice(commodityId: string, date: Date): Promise<Dai
 /**
  * Fetch all commodity prices for today and yesterday
  */
+/**
+ * Fetch all commodity prices for today and yesterday
+ */
 async function fetchAllCommodityPrices(): Promise<CommodityPrice[]> {
     const today = new Date();
     const yesterday = new Date(today);
@@ -97,48 +100,51 @@ async function fetchAllCommodityPrices(): Promise<CommodityPrice[]> {
 
     const prices: CommodityPrice[] = [];
 
-    // Try to fetch real data first
-    let useRealData = true;
+    // Process each commodity independently so one failure doesn't break others
+    await Promise.all(
+        ALL_COMMODITIES.map(async (commodity) => {
+            let currentPrice: DailyPrice | null = null;
+            let previousPrice: DailyPrice | null = null;
 
-    for (const commodity of ALL_COMMODITIES) {
-        let currentPrice: DailyPrice | null = null;
-        let previousPrice: DailyPrice | null = null;
-
-        if (useRealData) {
+            // Try to fetch real data
             try {
-                [currentPrice, previousPrice] = await Promise.all([fetchCommodityPrice(commodity.id, today), fetchCommodityPrice(commodity.id, yesterday)]);
-
-                // If first commodity fails, switch to mock data for all
-                if (!currentPrice && !previousPrice) {
-                    useRealData = false;
-                }
-            } catch {
-                useRealData = false;
+                // Fetch in parallel
+                const [cur, prev] = await Promise.all([fetchCommodityPrice(commodity.id, today), fetchCommodityPrice(commodity.id, yesterday)]);
+                currentPrice = cur;
+                previousPrice = prev;
+            } catch (err) {
+                console.warn(`Failed to fetch prices for ${commodity.name}:`, err);
             }
-        }
 
-        // Fallback to mock data if API fails
-        if (!currentPrice || !previousPrice) {
-            const mockPrices = generateMockPriceData(commodity.id, 2);
-            previousPrice = mockPrices[0];
-            currentPrice = mockPrices[1];
-        }
+            // Fallback to mock data ONLY if BOTH are missing
+            // If we have at least one, we try to use what we have (though calculation might be limited)
+            if (!currentPrice && !previousPrice) {
+                const mockPrices = generateMockPriceData(commodity.id, 2);
+                previousPrice = mockPrices[0];
+                currentPrice = mockPrices[1];
+            }
 
-        const { change, percent, trend } = calculatePriceChange(currentPrice?.price ?? 0, previousPrice?.price ?? 0);
+            const { change, percent, trend } = calculatePriceChange(currentPrice?.price ?? 0, previousPrice?.price ?? 0);
 
-        prices.push({
-            commodityId: commodity.id,
-            commodityName: commodity.name,
-            color: commodity.color,
-            currentPrice,
-            previousPrice,
-            priceChange: change,
-            priceChangePercent: percent,
-            trend,
-        });
-    }
+            prices.push({
+                commodityId: commodity.id,
+                commodityName: commodity.name,
+                color: commodity.color,
+                currentPrice,
+                previousPrice,
+                priceChange: change,
+                priceChangePercent: percent,
+                trend,
+            });
+        }),
+    );
 
-    return prices;
+    // Sort to maintain order
+    return prices.sort((a, b) => {
+        const indexA = ALL_COMMODITIES.findIndex((c) => c.id === a.commodityId);
+        const indexB = ALL_COMMODITIES.findIndex((c) => c.id === b.commodityId);
+        return indexA - indexB;
+    });
 }
 
 /**
@@ -148,46 +154,78 @@ async function fetchCommodityTrend(commodityIds: string[]): Promise<CommodityTre
     const dates = getTrendDates(COMMODITY_API_CONFIG.TREND_DAYS);
     const trendData: CommodityTrendData[] = [];
 
-    for (const commodityId of commodityIds) {
-        const commodity = getCommodityById(commodityId);
-        if (!commodity) continue;
+    await Promise.all(
+        commodityIds.map(async (commodityId) => {
+            const commodity = getCommodityById(commodityId);
+            if (!commodity) return;
 
-        const prices: DailyPrice[] = [];
-        let useRealData = true;
+            // Fetch all dates in parallel
+            const pricePromises = dates.map((date) => fetchCommodityPrice(commodityId, date));
+            const results = await Promise.all(pricePromises);
 
-        for (const date of dates) {
-            if (useRealData) {
-                try {
-                    const price = await fetchCommodityPrice(commodityId, date);
-                    if (price) {
-                        prices.push(price);
-                    } else {
-                        useRealData = false;
-                    }
-                } catch {
-                    useRealData = false;
-                }
+            // Filter out nulls to see what we actually got
+            const validPrices = results.filter((p): p is DailyPrice => p !== null);
+
+            // If we have NO valid data, use completely mock data
+            // This prevents showing an empty chart
+            if (validPrices.length === 0) {
+                const mockPrices = generateMockPriceData(commodityId, COMMODITY_API_CONFIG.TREND_DAYS);
+                trendData.push({
+                    commodityId,
+                    commodityName: commodity.name,
+                    color: commodity.color,
+                    prices: mockPrices,
+                });
+                return;
             }
-        }
 
-        // Fallback to mock data if API fails
-        if (prices.length < dates.length) {
-            const mockPrices = generateMockPriceData(commodityId, COMMODITY_API_CONFIG.TREND_DAYS);
+            // If we have partial data, we need to fill the gaps
+            // Strategy: Fill missing dates with the nearest available price (Forward/Backward fill)
+            const finalPrices: DailyPrice[] = dates.map((date, index) => {
+                const existing = results[index];
+                if (existing) return existing;
+
+                // Find nearest non-null value
+                // 1. Try to find previous value (most recent past)
+                for (let i = index - 1; i >= 0; i--) {
+                    if (results[i]) {
+                        return {
+                            ...results[i]!,
+                            date: formatDateDDMMYYYY(date),
+                            dateDisplay: formatDateForDisplay(date),
+                        };
+                    }
+                }
+
+                // 2. Try to find next value (future relative to this hole)
+                for (let i = index + 1; i < dates.length; i++) {
+                    if (results[i]) {
+                        return {
+                            ...results[i]!,
+                            date: formatDateDDMMYYYY(date),
+                            dateDisplay: formatDateForDisplay(date),
+                        };
+                    }
+                }
+
+                // Should not be reached because validPrices.length > 0
+                // But as safety, return a zero/empty price
+                return {
+                    date: formatDateDDMMYYYY(date),
+                    dateDisplay: formatDateForDisplay(date),
+                    price: 0,
+                    priceFormatted: "Rp 0",
+                };
+            });
+
             trendData.push({
                 commodityId,
                 commodityName: commodity.name,
                 color: commodity.color,
-                prices: mockPrices,
+                prices: finalPrices,
             });
-        } else {
-            trendData.push({
-                commodityId,
-                commodityName: commodity.name,
-                color: commodity.color,
-                prices,
-            });
-        }
-    }
+        }),
+    );
 
     return trendData;
 }
